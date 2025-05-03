@@ -1,2 +1,15 @@
-# predictive-codifference
-Code for the Predictive Codifference (PC) and PC Skill (PCS) paper.
+# Predictive Codifference (PC) & PC Skill (PCS)
+
+## Project Overview
+This project implements and evaluates the **Predictive Codifference (PC)** and **PC Skill (PCS)** measures for different applications.
+
+## Repository Structure
+- **simulation/**
+- **wb1/**
+- **wb2**: Applycation of PC/PCS to WeatherBench2 forecasts.
+  - **pc/**: Python scripts and helper modules for computing PC &rarr; `compute_pc0.py`, `compute_pc.py`, `easyuq_helper.py`
+  - **results/**: NetCDF outputs of computed PC metrics.
+  - **plots/**: Generated figures.
+  - **pc.ipynb**: Jupyter notebook for analysis and visualization.
+  - **requirements.txt**: Pinned Python packages for local development.
+  - **setup.py**: Installation requirements for running the evaluation on GCP with Apache Beam.
