@@ -1,0 +1,19 @@
+absl-py==2.1.0
+apache-beam==2.64.0
+Cartopy==0.23.0
+cftime==1.6.4.post1
+dask==2024.4.2
+fsspec==2024.3.1
+gcsfs==2024.3.1
+h5netcdf==1.3.0
+ipykernel==6.29.4
+isodisreg @ git+https://github.com/evwalz/isodisreg.git@c293eb3a126f200bf4894ecbab6157596c2a395e
+matplotlib==3.8.4
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.13.0
+tqdm==4.66.4
+git+https://github.com/google-research/weatherbench2.git@d29e2692ecce309b52407d7914af3baa62bbe2b9#egg=weatherbench2
+xarray==2025.4.0
+xarray-beam==0.8.0
+zarr==2.17.2
