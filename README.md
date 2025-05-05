@@ -1,12 +1,12 @@
-# Predictive Codifference (PC) & PC Skill (PCS)
+# Potential Continuous Ranked Probability Score (PC) & PC Skill (PCS)
 
 ## Project Overview
-This project implements and evaluates the **Predictive Codifference (PC)** and **PC Skill (PCS)** measures for different applications.
+This project implements and evaluates the **Potential Continuous Ranked Probability Score (PC)** and **PC Skill (PCS)** measures for different applications.
 
 ## Repository Structure
 - **simulation/**
 - **wb1/**
-- **wb2**: Applycation of PC/PCS to WeatherBench2 forecasts.
+- **wb2/**: Applycation of PC/PCS to WeatherBench2 forecasts.
   - **pc/**: Python scripts and helper modules for computing PC &rarr; `compute_pc0.py`, `compute_pc.py`, `easyuq_helper.py`
   - **results/**: NetCDF outputs of computed PC metrics.
   - **plots/**: Generated figures.
