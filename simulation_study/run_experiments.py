@@ -224,9 +224,12 @@ def plot_runtime():
 
 
 if __name__ == '__main__':
-    # run_simulation_example_1(n=10000, square_y=True)
-    # run_simulation_example_2(thresh_list=np.linspace(1, 40, 100), add_name='_graph')
-    # plot_thresh_graph()
-    # print_results()
-    analyze_runtime()
-    plot_runtime()
+    if not os.path.exists(save_plots):
+        print(f'Please create directory {save_plots}')
+    else:
+        # run_simulation_example_1(n=10000, square_y=True)
+        # run_simulation_example_2(thresh_list=np.linspace(1, 40, 100), add_name='_graph')
+        # plot_thresh_graph()
+        # print_results()
+        # analyze_runtime()
+        plot_runtime()
