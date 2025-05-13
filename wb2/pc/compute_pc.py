@@ -1,3 +1,30 @@
+"""
+This script computes in-sample IDR CRPS results and time measurements. 
+
+Example usage on Google Cloud Platform (GCP) with Apache Beam and Dataflow:
+
+python pc/compute_pc.py \
+--prediction_path=gs://weatherbench2/datasets/graphcast/2020/date_range_2019-11-16_2021-02-01_12_hours-240x121_equiangular_with_poles_conservative.zarr \
+--target_path=gs://weatherbench2/datasets/era5/1959-2023_01_10-6h-240x121_equiangular_with_poles_conservative.zarr \
+--output_path=gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_era5.zarr \
+--variables=2m_temperature,mean_sea_level_pressure,10m_wind_speed,total_precipitation_24hr \
+--time_start=2020-01-01 \
+--time_stop=2020-12-31 \
+--skip_non_headline=True \
+--chunk_size_lon=8 \
+--chunk_size_lat=11 \
+--runner=DataflowRunner \
+-- \
+--project=$PROJECT \
+--region=$REGION \
+--job_name=compute-pc-graphcast-240x121-vs-era5 \
+--temp_location=gs://$BUCKET/tmp/ \
+--staging_location=gs://$BUCKET/staging/ \
+--setup_file=./setup.py \
+--worker_machine_type=c3-standard-8 \
+--autoscaling_algorithm=THROUGHPUT_BASED
+"""
+
 import logging
 from absl import app
 from absl import flags
@@ -106,7 +133,7 @@ def compute_pc(key, prediction_chunk, targets=None, variable_level_mapping=None,
     from pc.easyuq_helper import compute_easyuq
 
     # Drop any time-offset
-    key = key.with_offsets(time=None)
+    # key = key.with_offsets(time=None)
 
     # Restrict forecast times so that forecast_time + lead_time lies within the target window (not necessary for 2020 data)
     start_time_bound = (targets.time[0] - prediction_chunk.prediction_timedelta).values[0]
@@ -122,20 +149,40 @@ def compute_pc(key, prediction_chunk, targets=None, variable_level_mapping=None,
     # Skip TP24hr for lead times of less than 24 hours
     if (var == 'total_precipitation_24hr') & (lead_time < 86400000000000):
         logging.info(f'Skipping {key}')
-        metrics = np.full((
-            len(prediction_chunk.longitude), 
-            len(prediction_chunk.latitude), 
+        # CRPS placeholder
+        crps = np.full((
+            len(prediction_chunk.longitude),
+            len(prediction_chunk.latitude),
             len(prediction_chunk.prediction_timedelta),
-            3), np.nan, dtype=np.float32)
-        coords = {
+            len(prediction_chunk.time)
+        ), np.nan, dtype=np.float32)
+        crps_coords = {
             'longitude': prediction_chunk.longitude,
             'latitude': prediction_chunk.latitude,
             'prediction_timedelta': prediction_chunk.prediction_timedelta,
-            'metric': ['pc', 'idr_time', 'eval_time']
+            'time': prediction_chunk.time
         }
+
+        # Dummy timing placeholder
+        time_dummy = np.full((
+            len(prediction_chunk.longitude),
+            len(prediction_chunk.latitude),
+            len(prediction_chunk.prediction_timedelta),
+            2
+        ), np.nan, dtype=np.float32)
+        time_coords = {
+            'longitude': prediction_chunk.longitude,
+            'latitude': prediction_chunk.latitude,
+            'prediction_timedelta': prediction_chunk.prediction_timedelta,
+            'task': ['idr_time', 'eval_time']
+        }
+
         easyuq_dataset = xr.Dataset(
-            {var: (('longitude', 'latitude', 'prediction_timedelta', 'metric'), metrics)},
-            coords=coords
+            {
+                f'{var}_crps': (('longitude','latitude','prediction_timedelta','time'), crps),
+                f'{var}_time': (('longitude','latitude','prediction_timedelta','task'), time_dummy),
+            },
+            coords={**crps_coords, **time_coords}
         )
         return key, easyuq_dataset
     
@@ -150,22 +197,43 @@ def compute_pc(key, prediction_chunk, targets=None, variable_level_mapping=None,
         # Skip if we only want the WB2 headline score levels
         if (level != headline_level) & skip_non_headline:
             logging.info(f'Skipping {key}')
-            metrics = np.full((
-                len(prediction_chunk.longitude), 
-                len(prediction_chunk.latitude), 
-                len(prediction_chunk.prediction_timedelta), 
+            crps = np.full((
+                len(prediction_chunk.longitude),
+                len(prediction_chunk.latitude),
+                len(prediction_chunk.prediction_timedelta),
                 len(prediction_chunk.level),
-                3), np.nan, dtype=np.float32)
-            coords={
+                len(prediction_chunk.time)
+            ), np.nan, dtype=np.float32)
+            crps_coords = {
                 'longitude': prediction_chunk.longitude,
                 'latitude': prediction_chunk.latitude,
                 'prediction_timedelta': prediction_chunk.prediction_timedelta,
                 'level': prediction_chunk.level,
-                'metric': ['pc', 'idr_time', 'eval_time']
+                'time': prediction_chunk.time
             }
+
+            # Dummy timing placeholder
+            time_dummy = np.full((
+                len(prediction_chunk.longitude),
+                len(prediction_chunk.latitude),
+                len(prediction_chunk.prediction_timedelta),
+                len(prediction_chunk.level),
+                2
+            ), np.nan, dtype=np.float32)
+            time_coords = {
+                'longitude': prediction_chunk.longitude,
+                'latitude': prediction_chunk.latitude,
+                'prediction_timedelta': prediction_chunk.prediction_timedelta,
+                'level': prediction_chunk.level,
+                'task': ['idr_time', 'eval_time']
+            }
+
             easyuq_dataset = xr.Dataset(
-                {var: (('longitude', 'latitude', 'prediction_timedelta', 'level', 'metric'), metrics)},
-                coords=coords
+                {
+                    f'{var}_crps': (('longitude','latitude','prediction_timedelta','level','time'), crps),
+                    f'{var}_time': (('longitude','latitude','prediction_timedelta','level','task'), time_dummy),
+                },
+                coords={**crps_coords, **time_coords}
             )
         else:
             logging.info(f'Processing {key}')
@@ -215,7 +283,7 @@ def main(argv):
 
     # Remove time from output chunks
     output_chunks = working_chunks.copy()
-    output_chunks.pop('time')
+    # output_chunks.pop('time')
         
     # Open target data
     logging.info('Opening targets.')
@@ -227,34 +295,50 @@ def main(argv):
     for var in VARIABLES.value:
         if 'level' in predictions[var].dims:
             template = xr.Dataset({
-                var: (('longitude', 'latitude', 'prediction_timedelta', 'level', 'metric'), da.full((
+                f'{var}_crps': (('longitude', 'latitude', 'prediction_timedelta', 'level', 'time'), da.full((
                     len(predictions.longitude), 
                     len(predictions.latitude), 
                     len(predictions.prediction_timedelta), 
                     len(predictions.level), 
-                    3
+                    len(predictions.time)
+                ), np.nan, dtype=np.float32)),
+                f'{var}_time': (('longitude', 'latitude', 'prediction_timedelta', 'level', 'task'), da.full((
+                    len(predictions.longitude), 
+                    len(predictions.latitude), 
+                    len(predictions.prediction_timedelta), 
+                    len(predictions.level), 
+                    2
                 ), np.nan, dtype=np.float32)),
             }, coords={
                 'longitude': predictions.longitude,
                 'latitude': predictions.latitude,
                 'prediction_timedelta': predictions.prediction_timedelta,
                 'level': predictions.level,
-                'metric': ['pc', 'idr_time', 'eval_time']
-            }).chunk({'longitude': CHUNK_SIZE_LON.value, 'latitude': CHUNK_SIZE_LAT.value, 'prediction_timedelta': 1, 'level': 1})
+                'time': predictions.time,
+                'task': ['idr_time', 'eval_time']
+            }).chunk(working_chunks)
             templates.append(template)
         else:
             template = xr.Dataset({
-                var: (('longitude', 'latitude', 'prediction_timedelta', 'metric'), da.full((
+                f'{var}_crps': (('longitude', 'latitude', 'prediction_timedelta', 'time'), da.full((
                     len(predictions.longitude), 
                     len(predictions.latitude), 
-                    len(predictions.prediction_timedelta), 
-                    3), np.nan, dtype=np.float32)),
+                    len(predictions.prediction_timedelta),
+                    len(predictions.time)
+                ), np.nan, dtype=np.float32)),
+                f'{var}_time': (('longitude', 'latitude', 'prediction_timedelta', 'task'), da.full((
+                    len(predictions.longitude), 
+                    len(predictions.latitude), 
+                    len(predictions.prediction_timedelta),
+                    2
+                ), np.nan, dtype=np.float32)),
             }, coords={
                 'longitude': predictions.longitude,
                 'latitude': predictions.latitude,
                 'prediction_timedelta': predictions.prediction_timedelta,
-                'metric': ['pc', 'idr_time', 'eval_time']
-            }).chunk({'longitude': CHUNK_SIZE_LON.value, 'latitude': CHUNK_SIZE_LAT.value, 'prediction_timedelta': 1})
+                'time': predictions.time,
+                'task': ['idr_time', 'eval_time']
+            }).chunk({'longitude': CHUNK_SIZE_LON.value, 'latitude': CHUNK_SIZE_LAT.value, 'prediction_timedelta': 1, 'time': -1})
             templates.append(template)
 
     final_template = xr.merge(templates)

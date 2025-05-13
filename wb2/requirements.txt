@@ -12,6 +12,7 @@ matplotlib==3.8.4
 numpy==1.26.4
 pandas==2.2.3
 scipy==1.13.0
+shapely<2.0
 tqdm==4.66.4
 git+https://github.com/google-research/weatherbench2.git@d29e2692ecce309b52407d7914af3baa62bbe2b9#egg=weatherbench2
 xarray==2025.4.0
