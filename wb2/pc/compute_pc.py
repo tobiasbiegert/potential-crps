@@ -132,9 +132,6 @@ def compute_pc(key, prediction_chunk, targets=None, variable_level_mapping=None,
     import xarray as xr
     from pc.easyuq_helper import compute_easyuq
 
-    # Drop any time-offset
-    # key = key.with_offsets(time=None)
-
     # Restrict forecast times so that forecast_time + lead_time lies within the target window (not necessary for 2020 data)
     start_time_bound = (targets.time[0] - prediction_chunk.prediction_timedelta).values[0]
     end_time_bound = (targets.time[-1] - prediction_chunk.prediction_timedelta).values[-1]
