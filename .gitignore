@@ -77,6 +77,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+wb2/*.ipynb
 
 # IPython
 profile_default/
@@ -143,3 +144,6 @@ cython_debug/
 
 # ignore the full weatherbench2 checkout
 weatherbench2/
+
+# ignore results directory
+wb2/results/
