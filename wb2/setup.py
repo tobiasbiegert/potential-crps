@@ -12,10 +12,10 @@ setup(
     packages=find_packages(include=['pc']),
     install_requires=[
         'xarray>=2024.11.0',
-        'xarray-beam',
-        'zarr',
+        'xarray-beam==0.8.0',
+        'zarr==2.17.2',
         'apache-beam[gcp]>=2.31.0',
-        'gcsfs',
+        'gcsfs==2024.3.1',
         'weatherbench2[gcp] @ git+https://github.com/google-research/weatherbench2.git@main#egg=weatherbench2',
         'isodisreg @ git+https://github.com/evwalz/isodisreg.git#egg=isodisreg'
     ]

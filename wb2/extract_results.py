@@ -1,7 +1,8 @@
 import xarray as xr
+import numpy as np
 from dask.diagnostics import ProgressBar
 
-# 1) Settings
+# Variables
 variables = [
     'mean_sea_level_pressure',
     '2m_temperature',
@@ -9,17 +10,32 @@ variables = [
     'total_precipitation_24hr',
 ]
 
+# Lead times as numpy timedeltas for slicing
+lead_times = [
+    np.timedelta64(1, 'D'),
+    np.timedelta64(3, 'D'),
+    np.timedelta64(5, 'D'),
+    np.timedelta64(7, 'D'),
+    np.timedelta64(10, 'D')
+]
+
 # List out each model
 models_vs_era5 = {
-    'graphcast_vs_era5':    'gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_era5.zarr',
-    'pangu_vs_era5':        'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_era5.zarr',
-    'ifs_hres_vs_era5':     'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
+    'graphcast_vs_era5':             'gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_era5.zarr',
+    'graphcast_operational_vs_era5': 'gs://$BUCKET/easyuq/pc/graphcast_operational_240x121_vs_era5.zarr',
+    'pangu_vs_era5':                 'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_era5.zarr',
+    'pangu_operational_vs_era5':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_era5.zarr',
+    'ifs_hres_vs_era5':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
+    'fuxi_vs_era5':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
 }
 
 models_vs_ifs_analysis = {
-    'graphcast_vs_ifs_analysis':    'gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_ifs_analysis.zarr',
-    'pangu_vs_ifs_analysis':        'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_ifs_analysis.zarr',
-    'ifs_hres_vs_ifs_analysis':     'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
+    'graphcast_vs_ifs_analysis':             'gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_ifs_analysis.zarr',
+    'graphcast_operational_vs_ifs_analysis': 'gs://$BUCKET/easyuq/pc/graphcast_operational_240x121_vs_ifs_analysis.zarr',
+    'pangu_vs_ifs_analysis':                 'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_ifs_analysis.zarr',
+    'pangu_operational_vs_ifs_analysis':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_ifs_analysis.zarr',
+    'ifs_hres_vs_ifs_analysis':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
+    'fuxi_vs_ifs_analysis':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
 }
 
 # PC^0
@@ -58,7 +74,7 @@ def process_model(name, zarr_path, pc0):
     ds_pc = (
         ds_crps
         .mean(dim='time') 
-        .rename(rename_crps)
+        # .rename(rename_crps)
         .expand_dims(metric=['pc'])
     )
 
@@ -107,10 +123,11 @@ python weatherbench2/scripts/evaluate.py \
 --worker_machine_type=c3-highmem-8 \
 --autoscaling_algorithm=THROUGHPUT_BASED
 """
+
 with ProgressBar():
-    ifs_ens_vs_era5_crps = xr.open_zarr('gs://wb2_pp/baseline/ifs_ens_240x121_surface_vs_era5_2020_probabilistic_spatial.zarr').sel(lead_time=lead_times, metric='crps').load()
+    ifs_ens_vs_era5_crps = xr.open_zarr('gs://$BUCKET/baseline/ifs_ens_240x121_surface_vs_era5_2020_probabilistic_spatial.zarr', decode_timedelta=True).sel(lead_time=lead_times, metric='crps').load()
 ifs_ens_vs_era5_crps.to_netcdf('results/ifs_ens_vs_era5_crps.nc')
 
-# with ProgressBar():
-#     ifs_ens_vs_ifs_analysis_crps = xr.open_zarr('gs://wb2_pp/baseline/ifs_ens_240x121_surface_vs_ifs_analysis_2020_probabilistic_spatial.zarr').sel(lead_time=lead_times, metric='crps').load()
-# ifs_ens_vs_ifs_analysis_crps.to_netcdf('results/ifs_ens_vs_ifs_analysis_crps.nc')
+with ProgressBar():
+    ifs_ens_vs_ifs_analysis_crps = xr.open_zarr('gs://$BUCKET/baseline/ifs_ens_240x121_vs_analysis_2020_probabilistic_spatial.zarr', decode_timedelta=True)[variables[:-1]].sel(lead_time=lead_times, metric='crps').load()
+ifs_ens_vs_ifs_analysis_crps.to_netcdf('results/ifs_ens_vs_ifs_analysis_crps.nc')
