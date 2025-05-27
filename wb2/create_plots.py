@@ -50,12 +50,14 @@ pangu_vs_era5_results = xr.open_dataset('results/pangu_vs_era5_pc.nc', decode_ti
 ifs_hres_vs_era5_results = xr.open_dataset('results/ifs_hres_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 graphcast_operational_vs_era5_results = xr.open_dataset('results/graphcast_operational_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_operational_vs_era5_results = xr.open_dataset('results/pangu_operational_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
+era5_climatology_vs_era5_results = xr.open_dataset('results/era5_climatology_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 
 graphcast_vs_ifs_analysis_results = xr.open_dataset('results/graphcast_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_vs_ifs_analysis_results = xr.open_dataset('results/pangu_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 ifs_hres_vs_ifs_analysis_results = xr.open_dataset('results/ifs_hres_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 graphcast_operational_vs_ifs_analysis_results = xr.open_dataset('results/graphcast_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_operational_vs_ifs_analysis_results = xr.open_dataset('results/pangu_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
+era5_climatology_vs_ifs_analysis_results = xr.open_dataset('results/era5_climatology_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 
 # Load in IFS ENS CRPS
 ifs_ens_vs_era5 = xr.open_dataset('results/ifs_ens_vs_era5_crps.nc', decode_timedelta=True).sel(lead_time=lead_times).load()
@@ -78,25 +80,29 @@ pangu_vs_era5_results_spatial_avg = pangu_vs_era5_results.map(_spatial_average, 
 ifs_hres_vs_era5_results_spatial_avg = ifs_hres_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 graphcast_operational_vs_era5_results_spatial_avg = graphcast_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 pangu_operational_vs_era5_results_spatial_avg = pangu_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
+era5_climatology_vs_era5_results_spatial_avg = era5_climatology_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 
 graphcast_vs_ifs_analysis_results_spatial_avg = graphcast_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 pangu_vs_ifs_analysis_results_spatial_avg = pangu_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 ifs_hres_vs_ifs_analysis_results_spatial_avg = ifs_hres_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 graphcast_operational_vs_ifs_analysis_results_spatial_avg = graphcast_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 pangu_operational_vs_ifs_analysis_results_spatial_avg = pangu_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
+era5_climatology_vs_ifs_analysis_results_spatial_avg = era5_climatology_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 
-# Compute mean
-graphcast_vs_era5_results_mean = graphcast_vs_era5_results.mean(dim=['latitude', 'longitude'])
-pangu_vs_era5_results_mean = pangu_vs_era5_results.mean(dim=['latitude', 'longitude'])
-ifs_hres_vs_era5_results_mean = ifs_hres_vs_era5_results.mean(dim=['latitude', 'longitude'])
-graphcast_operational_vs_era5_results_mean = graphcast_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
-pangu_operational_vs_era5_results_mean = pangu_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# # Compute mean
+# graphcast_vs_era5_results_mean = graphcast_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# pangu_vs_era5_results_mean = pangu_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# ifs_hres_vs_era5_results_mean = ifs_hres_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# graphcast_operational_vs_era5_results_mean = graphcast_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# pangu_operational_vs_era5_results_mean = pangu_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
+# era5_climatology_vs_era5_results_mean = era5_climatology_vs_era5_results.mean(dim=['latitude', 'longitude'])
 
-graphcast_vs_ifs_analysis_results_mean = graphcast_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-pangu_vs_ifs_analysis_results_mean = pangu_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-ifs_hres_vs_ifs_analysis_results_mean = ifs_hres_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-graphcast_operational_vs_ifs_analysis_results_mean = graphcast_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-pangu_operational_vs_ifs_analysis_results_mean = pangu_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# graphcast_vs_ifs_analysis_results_mean = graphcast_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# pangu_vs_ifs_analysis_results_mean = pangu_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# ifs_hres_vs_ifs_analysis_results_mean = ifs_hres_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# graphcast_operational_vs_ifs_analysis_results_mean = graphcast_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# pangu_operational_vs_ifs_analysis_results_mean = pangu_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
+# era5_climatology_vs_ifs_analysis_results_mean = era5_climatology_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
 
 # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
 # Create the figure and subplots
@@ -118,7 +124,7 @@ for ax, var, title, unit in zip(axes, variables[:-1], titles[:-1], units[:-1]):
     ax.set_title(title, fontsize=22)
     ax.set_xticks(lead_time_days)
     ax.set_ylim(0)
-    ax.set_ylabel('Latitude Weighted Mean PCRPS ' + unit, fontsize=16)
+    ax.set_ylabel('Latitude-Weighted PC ' + unit, fontsize=18)
     ax.tick_params(axis='both', which='major', labelsize=17)
 
 plt.tight_layout()
@@ -140,7 +146,9 @@ fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
 for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:-1]):
     ax.plot(lead_time_days,
             era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-            label='ERA5 $\\text{PCRPS}^{(0)}$', color='tab:red')
+            label='ERA5 $\\text{PC}^{(0)}$', color='tab:red')
+    ax.plot(lead_time_days,
+            era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var], color='tab:brown')
     ax.plot(lead_time_days,
             ifs_hres_vs_era5_results_spatial_avg.sel(metric='pc')[var], color='tab:blue')
     ax.plot(lead_time_days,
@@ -152,14 +160,17 @@ for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:
     ax.set_title(title, fontsize=22)
     ax.set_xticks(lead_time_days)
     ax.set_ylim(0)
-    ax.set_ylabel('Latitude Weighted Mean PCRPS ' + unit, fontsize=16)
+    ax.set_ylabel('Latitude-Weighted PC ' + unit, fontsize=18)
     ax.tick_params(axis='both', which='major', labelsize=17)
 
 # ----------------------- Ground Truth IFS Analysis -----------------------
 for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:-1]):
     ax.plot(lead_time_days,
             ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-            label='IFS Analysis $\\text{PCRPS}^{(0)}$', color='tab:purple')
+            label='IFS Analysis $\\text{PC}^{(0)}$', color='tab:purple')
+    ax.plot(lead_time_days,
+            era5_climatology_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            label='ERA5 Climatology', color='tab:brown')
     ax.plot(lead_time_days,
             ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
             label='HRES', color='tab:blue')
@@ -174,7 +185,7 @@ for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:
     ax.set_title(title, fontsize=22)
     ax.set_xticks(lead_time_days)
     ax.set_ylim(0)
-    ax.set_ylabel('Latitude Weighted Mean PCRPS ' + unit, fontsize=16)
+    ax.set_ylabel('Latitude-Weighted PC ' + unit, fontsize=18)
     ax.tick_params(axis='both', which='major', labelsize=17)
 
 plt.tight_layout()
@@ -213,8 +224,8 @@ for h, l in zip(handles_lower, labels_lower):
 combined_handles = list(combined_legend.values())
 combined_labels = list(combined_legend.keys())
 
-fig.legend(combined_handles, combined_labels, loc='lower center', ncol=5, 
-           bbox_to_anchor=(0.5, -0.075), fontsize=22)
+fig.legend(combined_handles, combined_labels, loc='lower center', ncol=6, 
+           bbox_to_anchor=(0.5, -0.075), fontsize=20, columnspacing=1.5)
 
 plt.savefig('plots/lineplot_lat_mean_pc.png', facecolor='white', edgecolor='none', bbox_inches='tight')
 
@@ -333,32 +344,32 @@ plots = [
         graphcast_vs_ifs_analysis_results_spatial_avg,
         graphcast_operational_vs_ifs_analysis_results_spatial_avg,
         ax_gc_ifs,
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ GC-ERA5',
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ GC-IFS',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{GC-ERA5})}$',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{GC-IFS})}$',
         'Ground Truth: IFS Analysis'
     ),
     (
         pangu_vs_ifs_analysis_results_spatial_avg,
         pangu_operational_vs_ifs_analysis_results_spatial_avg,
         ax_pn_ifs,
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ PW-ERA5',
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ PW-IFS',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{PW-ERA5})}$',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{PW-IFS})}$',
         'Ground Truth: IFS Analysis'
     ),
     (
         graphcast_vs_era5_results_spatial_avg,
         graphcast_operational_vs_era5_results_spatial_avg,
         ax_gc_era5,
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ GC-ERA5',
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ GC-IFS',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{GC-ERA5})}$',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{GC-IFS})}$',
         'Ground Truth: ERA5'
     ),
     (
         pangu_vs_era5_results_spatial_avg,
         pangu_operational_vs_era5_results_spatial_avg,
         ax_pn_era5,
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ PW-ERA5',
-        'Latitude-Weighted Mean $\\text{PCRPS}_{\\text{skill}}$ PW-IFS',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{PW-ERA5})}$',
+        'Latitude-Weighted $\\text{PCS}^{(\\text{PW-IFS})}$',
         'Ground Truth: ERA5'
     ),
 ]
@@ -373,8 +384,8 @@ for nonop_ds, op_ds, ax, xl, yl, ttl in plots:
         y = op_ds.sel(metric='pcs')[var].values
 
         # scatter + connecting line
-        ax.scatter(x, y, color=c, s=30)
-        ax.plot(x, y, color=c, label=title)
+        ax.scatter(x, y, color=c, s=60)
+        ax.plot(x, y, color=c, linewidth=3, label=title)
 
     # Fix both axes to [0, 1]
     ax.set_xlim(0, 1)
@@ -454,7 +465,7 @@ for ax, var, title, xlim_val, ylim_val, unit in zip(axes, variables[:-1], titles
     ax.plot([xlim_val[0], xlim_val[1]], [ylim_val[0], ylim_val[1]], color='k', linestyle='--', linewidth=1.5)
     
     ax.set_ylabel('ENS $\overline{\\text{CRPS}}$ ' + unit, fontsize=20)
-    ax.set_xlabel('HRES PCRPS ' + unit, fontsize=20)
+    ax.set_xlabel('HRES PC ' + unit, fontsize=20)
     ax.set_title(title, fontsize=28)
     ax.set_xlim(xlim_val)
     ax.set_ylim(ylim_val)
@@ -532,10 +543,10 @@ fig.legend(
     [handle.get_label() for handle in legend_handles],
     loc='lower center', 
     ncol=len(unique_leads), 
-    bbox_to_anchor=(0.5175, 0.0), 
+    bbox_to_anchor=(0.5175, -0.01), 
     fontsize=18, 
     title='Lead Time [d]', 
-    title_fontsize=20, 
+    title_fontsize=22, 
     prop={'size': 20}, 
     handletextpad=0.5
 )
@@ -592,12 +603,12 @@ for ax, var, title in zip(axes[0, :], variables[:-1], titles[:-1]):
     ax.boxplot(data_pangu_hres, positions=positions_pangu_hres, boxprops=dict(facecolor='tab:orange'), **boxplot_kwargs)
     
     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    ax.set_title(title, fontsize=18)
+    ax.set_title(title, fontsize=22)
     ax.set_xticks(x_ticks)
     ax.tick_params(axis='both', which='major', labelsize=17)
     ax.set_xticklabels([str(x) for x in x_ticks])
     if title=='MSLP':
-        ax.set_ylabel('p-values', fontsize=18)  
+        ax.set_ylabel('p-Value', fontsize=18)  
 
 # ----------------------- Ground Truth IFS Analysis -----------------------
 for ax, var, title in zip(axes[1, :], variables[:-1], titles[:-1]):
@@ -644,7 +655,7 @@ for ax, var, title in zip(axes[1, :], variables[:-1], titles[:-1]):
     ax.tick_params(axis="both", which="major", labelsize=17)
     ax.set_xticklabels([str(x) for x in x_ticks])
     if title=='MSLP':
-        ax.set_ylabel('p-values', fontsize=18)    
+        ax.set_ylabel('p-Value', fontsize=18)    
 
 plt.tight_layout()
 plt.subplots_adjust(hspace=0.4)
@@ -670,11 +681,11 @@ fig.text(row2_center_x, row2_top + 0.04, "Ground Truth: IFS Analysis",
 
 # Shared legend
 legend_handles = [
-    Patch(facecolor='tab:green', label='$\\text{H}_0: \\text{PCRPS}^{(\\text{GC-ERA5})} \geq \\text{PCRPS}^{(\\text{PW-ERA5})}$'),
-    Patch(facecolor='tab:blue', label='$\\text{H}_0: \\text{PCRPS}^{(\\text{GC-ERA5})} \geq \\text{PCRPS}^{(\\text{HRES})}$'),
-    Patch(facecolor='tab:orange', label='$\\text{H}_0: \\text{PCRPS}^{(\\text{PW-ERA5})} \geq \\text{PCRPS}^{(\\text{HRES})}$')
+    Patch(facecolor='tab:green', label='$\\text{H}_0: \\text{PC}^{(\\text{GC-ERA5})} \geq \\text{PC}^{(\\text{PW-ERA5})}$'),
+    Patch(facecolor='tab:blue', label='$\\text{H}_0: \\text{PC}^{(\\text{GC-ERA5})} \geq \\text{PC}^{(\\text{HRES})}$'),
+    Patch(facecolor='tab:orange', label='$\\text{H}_0: \\text{PC}^{(\\text{PW-ERA5})} \geq \\text{PC}^{(\\text{HRES})}$')
 ]
 
-fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=19)
+fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
 
 plt.savefig('plots/boxplot_pvalues.png', facecolor='white', edgecolor='none', bbox_inches='tight')
