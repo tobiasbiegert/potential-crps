@@ -252,7 +252,7 @@ def compute_pc(key, prediction_chunk, targets=None, variable_level_mapping=None,
 
 def main(argv):
     # Open model outputs and get input chunks
-    predictions, input_chunks = xbeam.open_zarr(PREDICTION_PATH.value)
+    predictions, input_chunks = xbeam.open_zarr(PREDICTION_PATH.value, decode_timedelta=True)
 
     logging.info('Selecting variables, lead times and time.')
     
@@ -272,15 +272,15 @@ def main(argv):
     # Define working chunks
     working_chunks = {'longitude': CHUNK_SIZE_LON.value, 'latitude': CHUNK_SIZE_LAT.value, 'prediction_timedelta': 1, 'level': 1, 'time': -1}
 
-    if "level" not in predictions.dims:
-        input_chunks.pop("level")
-        working_chunks.pop("level")
+    if 'level' not in predictions.dims:
+        if 'level' in input_chunks:
+            input_chunks.pop('level')
+        working_chunks.pop('level')
     else:
         predictions = predictions.sel(level=[int(level) for level in LEVELS.value])
 
     # Remove time from output chunks
     output_chunks = working_chunks.copy()
-    # output_chunks.pop('time')
         
     # Open target data
     logging.info('Opening targets.')
