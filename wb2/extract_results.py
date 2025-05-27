@@ -26,7 +26,7 @@ models_vs_era5 = {
     'pangu_vs_era5':                 'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_era5.zarr',
     'pangu_operational_vs_era5':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_era5.zarr',
     'ifs_hres_vs_era5':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
-    'fuxi_vs_era5':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
+    'era5_climatology_vs_era5':      'results/era5_climatology_240x121_vs_era5.zarr',
 }
 
 models_vs_ifs_analysis = {
@@ -35,7 +35,7 @@ models_vs_ifs_analysis = {
     'pangu_vs_ifs_analysis':                 'gs://$BUCKET/easyuq/pc/pangu_240x121_vs_ifs_analysis.zarr',
     'pangu_operational_vs_ifs_analysis':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_ifs_analysis.zarr',
     'ifs_hres_vs_ifs_analysis':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
-    'fuxi_vs_ifs_analysis':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
+    'era5_climatology_vs_ifs_analysis':      'results/era5_climatology_240x121_vs_ifs_analysis.zarr',
 }
 
 # PC^0
@@ -73,8 +73,7 @@ def process_model(name, zarr_path, pc0):
     # Prepare PC slice
     ds_pc = (
         ds_crps
-        .mean(dim='time') 
-        # .rename(rename_crps)
+        .mean(dim='time')
         .expand_dims(metric=['pc'])
     )
 
