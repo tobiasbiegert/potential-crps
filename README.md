@@ -9,6 +9,7 @@ This project implements and evaluates the **Potential Continuous Ranked Probabil
 - **wb2/**: Applycation of PC/PCS to WeatherBench2 forecasts
   - **pc/**: Python scripts and helper modules for computing PC &rarr; `compute_pc0.py`, `compute_pc.py`, `easyuq_helper.py`
   - **plots/**: Generated figures
+  - `construct_era5_climatology_forecasts.py` &rarr; script for shaping a climatology dataset in same format as other WB2 forecast datasets
   - `extract_results.py` &rarr; script for downloading CRPS results from GCP bucket and storing PC, PCS, and time measurements on disk
   - `create_plots.py` &rarr; script for visualizations
   - `test_pc.py` &rarr; script for testing
