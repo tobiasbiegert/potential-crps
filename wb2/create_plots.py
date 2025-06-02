@@ -148,7 +148,8 @@ for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:
             era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
             label='ERA5 $\\text{PC}^{(0)}$', color='tab:red')
     ax.plot(lead_time_days,
-            era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var], color='tab:brown')
+            era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var],
+            label='ERA5 Climatology', color='tab:brown')
     ax.plot(lead_time_days,
             ifs_hres_vs_era5_results_spatial_avg.sel(metric='pc')[var], color='tab:blue')
     ax.plot(lead_time_days,
@@ -168,9 +169,6 @@ for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:
     ax.plot(lead_time_days,
             ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
             label='IFS Analysis $\\text{PC}^{(0)}$', color='tab:purple')
-    ax.plot(lead_time_days,
-            era5_climatology_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
-            label='ERA5 Climatology', color='tab:brown')
     ax.plot(lead_time_days,
             ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
             label='HRES', color='tab:blue')
@@ -221,13 +219,90 @@ for h, l in zip(handles_upper, labels_upper):
 for h, l in zip(handles_lower, labels_lower):
     combined_legend[l] = h
 
-combined_handles = list(combined_legend.values())
-combined_labels = list(combined_legend.keys())
+legend_order = [
+    'ERA5 $\\text{PC}^{(0)}$',
+    'IFS Analysis $\\text{PC}^{(0)}$',
+    'ERA5 Climatology',
+    'HRES',
+    'PW-ERA5',
+    'GC-ERA5',
+    'FuXi-ERA5'
+]
 
-fig.legend(combined_handles, combined_labels, loc='lower center', ncol=6, 
+# pick out handles in that order (skipping any that aren’t present)
+ordered_handles = [combined_legend[label] for label in legend_order if label in combined_legend]
+ordered_labels  = [label for label in legend_order if label in combined_legend]
+
+fig.legend(ordered_handles, ordered_labels, loc='lower center', ncol=6, 
            bbox_to_anchor=(0.5, -0.075), fontsize=20, columnspacing=1.5)
 
 plt.savefig('plots/lineplot_lat_mean_pc.png', facecolor='white', edgecolor='none', bbox_inches='tight')
+
+# ----------- Map plot for Skill of GraphCast with ERA5 as ground truth. ------------------ #
+# Create a meshgrid for plotting
+skill = (era5_climatology_vs_era5_results.sel(metric='pc') - graphcast_vs_era5_results.sel(metric='pc')) / era5_climatology_vs_era5_results.sel(metric='pc')
+
+vmin = min([skill[var].min() for var in variables[:-1]])
+
+n_colors = 256
+# fraction of the range that is negative:
+frac_neg = -vmin / (1.0 - vmin)
+# number of discrete colors for negative side
+n_neg = int(np.round(frac_neg * n_colors))
+n_neg = np.clip(n_neg, 1, n_colors-1)
+
+neg_cmap = plt.cm.OrRd(np.linspace(0, 1, n_neg))      # reversed Reds: red→light
+pos_cmap = plt.cm.viridis(np.linspace(0, 1, n_colors - n_neg))
+combined_cmap = np.vstack([neg_cmap, pos_cmap])
+
+cmap = mcolors.ListedColormap(combined_cmap)
+norm = mcolors.Normalize(vmin=vmin, vmax=1)
+
+lon = era5_pc0['longitude'].values
+lat = era5_pc0['latitude'].values
+lon_grid, lat_grid = np.meshgrid(lon, lat)
+
+n_rows = len(lead_times)
+n_cols = len(variables[:-1])
+
+# Create a grid of subplots with one row per lead time and one column per variable
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 6, n_rows * 4), subplot_kw={'projection': ccrs.Robinson()}, constrained_layout=True)
+
+for i, lt in enumerate(lead_times):
+    # Convert lead time to days for the row label
+    lt_days = int(lt / np.timedelta64(1, 'D'))
+    
+    for j, (var, var_title) in enumerate(zip(variables[:-1], titles[:-1])):
+        ax = axes[i, j]
+        ax.coastlines()
+        
+        # Select the data for the variable at the given lead time
+        data = skill.sel(prediction_timedelta=lt)[var]
+        
+        # Plot the data
+        mesh = ax.pcolormesh(lon_grid, lat_grid, data.T, cmap=cmap, norm=norm, transform=ccrs.PlateCarree(), linewidth=0.5)
+        
+        # Every subplot gets its variable title on top
+        ax.set_title(var_title, fontsize=24)
+        
+        # If this is the bottom row, add an x-axis label and the colorbar
+        if i == n_rows - 1:
+            ax.set_xlabel('Longitude')
+            cbar = plt.colorbar(mesh, ax=ax, orientation='horizontal', shrink=0.75, pad=0.1)
+            cbar.ax.tick_params(labelsize=18)
+            cbar.set_label('$\\text{Skill}^{(\\text{GC-ERA5})}$', fontsize=22)
+    
+    # Annotate the left-most subplot of the current row with the lead time information.
+    axes[i, 0].annotate(
+        f"Lead Time: {lt_days} day" if i==0 else f"Lead Time: {lt_days} days",
+        fontsize=22,
+        xy=(-0.1, 0.5), 
+        xycoords='axes fraction',
+        rotation=90, 
+        va='center'
+    )
+
+plt.savefig('plots/maps_graphcast_vs_era5_skill.png', facecolor='white', edgecolor='none', bbox_inches='tight')
 
 # ----------- Map plot for PCS of GraphCast with ERA5 as ground truth. ------------------ #
 # Create a meshgrid for plotting
@@ -681,9 +756,9 @@ fig.text(row2_center_x, row2_top + 0.04, "Ground Truth: IFS Analysis",
 
 # Shared legend
 legend_handles = [
-    Patch(facecolor='tab:green', label='$\\text{H}_0: \\text{PC}^{(\\text{GC-ERA5})} \geq \\text{PC}^{(\\text{PW-ERA5})}$'),
-    Patch(facecolor='tab:blue', label='$\\text{H}_0: \\text{PC}^{(\\text{GC-ERA5})} \geq \\text{PC}^{(\\text{HRES})}$'),
-    Patch(facecolor='tab:orange', label='$\\text{H}_0: \\text{PC}^{(\\text{PW-ERA5})} \geq \\text{PC}^{(\\text{HRES})}$')
+    Patch(facecolor='tab:green', label='GC-ERA5 vs PW-ERA5'),
+    Patch(facecolor='tab:blue', label='GC-ERA5 vs HRES'),
+    Patch(facecolor='tab:orange', label='PW-ERA5 vs HRES')
 ]
 
 fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
