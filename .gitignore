@@ -145,5 +145,7 @@ cython_debug/
 # ignore the full weatherbench2 checkout
 weatherbench2/
 
-# ignore results directory
+# ignore directories
 wb2/results/
+wb2/plots/
+wb2/data/
