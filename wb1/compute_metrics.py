@@ -101,7 +101,7 @@ class MetricComputer:
     @staticmethod
     def acc(obs: np.ndarray, fct: np.ndarray, clim: np.ndarray) -> float:
         """
-        Compute Anomaly Correlation Coefficient using your original method.
+        Compute Anomaly Correlation Coefficient.
         
         Args:
             obs: Observed values
