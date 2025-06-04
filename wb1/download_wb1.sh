@@ -1,7 +1,7 @@
 #!/bin/bash
 # Create directory for downloads
 
-DOWNLOAD_PATH="/Volumes/My Passport for Mac/pred_codiff/temp_wb1/wb_data/"
+DOWNLOAD_PATH="./temp_wb1/wb_data/"
 
 mkdir -p "$DOWNLOAD_PATH"
 
