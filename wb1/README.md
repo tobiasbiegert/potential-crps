@@ -1,4 +1,4 @@
-# WeatherBench1 (WB1) Analysis
+# Weather Benchmark (WB) Analysis
 
 This repository contains code for analyzing and comparing different weather forecast models using various meteorological metrics.
 
@@ -17,15 +17,23 @@ This will download the necessary weather data files into the `./wb_data/` direct
 
 3. Compute the metrics for all models by running:
 ```bash
-python compute_metrics.py
+python compute_metrics.py [--base_dir BASE_DIR] [--output_dir OUTPUT_DIR]
 ```
-This will calculate various metrics (RMSE, CPA, PC, PCS, ACC) for each model and save the results in the `./metrics/` directory.
+This will calculate various metrics (RMSE, CPA, PC, PCS, ACC) for each model and save the results in the `./metrics/` directory by default.
+
+Optional arguments:
+- `--base_dir`: Directory containing weather data (default: ./wb_data)
+- `--output_dir`: Directory to save computed metrics (default: ./metrics)
 
 4. Generate visualizations by running:
 ```bash
-python visualization.py
+python visualization.py [--metrics_dir METRICS_DIR] [--output_dir OUTPUT_DIR]
 ```
-This will create a PDF figure showing metrics for different forecasts
+This will create a PDF figure showing metrics for different forecasts.
+
+Optional arguments:
+- `--metrics_dir`: Directory containing metric files (default: ./metrics)
+- `--output_dir`: Directory to save plots (default: metrics_dir/plots/)
 
 ## Directory Structure
 
@@ -48,7 +56,7 @@ The analysis includes the following forecast models:
 
 The following metrics are computed for each model:
 - Root Mean Square Error (RMSE)
-- Coefficient of Predictive Ability (CPA)
-- Potential Continuous Ranked Probability Score (PC)
-- Potential Continuous Ranked Probability Skill Score (PCS)
+- Centered Pattern Accuracy (CPA)
+- Pattern Correlation (PC)
+- Pattern Correlation Skill score (PCS)
 - Anomaly Correlation Coefficient (ACC) 
