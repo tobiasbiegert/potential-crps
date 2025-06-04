@@ -1,4 +1,4 @@
-# Weather Benchmark (WB) Analysis
+# WeatherBench1 (WB1) Analysis
 
 This repository contains code for analyzing and comparing different weather forecast models using various meteorological metrics.
 
@@ -48,7 +48,7 @@ The analysis includes the following forecast models:
 
 The following metrics are computed for each model:
 - Root Mean Square Error (RMSE)
-- Centered Pattern Accuracy (CPA)
-- Pattern Correlation (PC)
-- Pattern Correlation Skill score (PCS)
+- Coefficient of Predictive Ability (CPA)
+- Potential Continuous Ranked Probability Score (PC)
+- Potential Continuous Ranked Probability Skill Score (PCS)
 - Anomaly Correlation Coefficient (ACC) 
