@@ -49,7 +49,7 @@ class MetricComputer:
     @staticmethod
     def cpa(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Centered Pattern Accuracy.
+        Compute Coefficient of Predictive Ability.
         
         Args:
             obs: Observed values
@@ -84,7 +84,7 @@ class MetricComputer:
     @staticmethod
     def rmse(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Root Mean Square Error.
+        Compute Root Mean Squared Error.
         
         Args:
             obs: Observed values
@@ -136,7 +136,7 @@ class MetricComputer:
     @staticmethod
     def pc(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Pattern Correlation using isotonic distributional regression.
+        Compute Potential CRPS using isotonic distributional regression.
         
         Args:
             obs: Observed values
@@ -165,7 +165,7 @@ class MetricComputer:
     @staticmethod
     def pcs(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Pattern Correlation Skill score.
+        Compute PC Skill.
         
         Args:
             obs: Observed values
