@@ -55,8 +55,8 @@ The analysis includes the following forecast models:
 ## Metrics Computed
 
 The following metrics are computed for each model:
-- Root mean squared error (RMSE)
-- Coefficient of predictive ability (CPA)
-- Potential continuous ranked probability score (PC)
-- PC skill (PCS)
-- Anomaly correlation coefficient (ACC) 
+- Root Mean Squared Error (RMSE)
+- Coefficient of Predictive Ability (CPA)
+- Potential Continuous Ranked Probability Score (PC)
+- PC Skill (PCS)
+- Anomaly Correlation Coefficient (ACC) 
