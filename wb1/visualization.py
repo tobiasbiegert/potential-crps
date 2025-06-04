@@ -385,7 +385,7 @@ def main():
     """Main function to create visualizations."""
     
     # Default paths based on your metric computation script
-    metrics_dir = "./temp_wb1/metrics/"
+    metrics_dir = "./metrics/"
     output_dir = None  # Will default to metrics_dir/plots/
     
     logger.info(f"Metrics directory: {metrics_dir}")
