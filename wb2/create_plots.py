@@ -89,21 +89,6 @@ graphcast_operational_vs_ifs_analysis_results_spatial_avg = graphcast_operationa
 pangu_operational_vs_ifs_analysis_results_spatial_avg = pangu_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 era5_climatology_vs_ifs_analysis_results_spatial_avg = era5_climatology_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 
-# # Compute mean
-# graphcast_vs_era5_results_mean = graphcast_vs_era5_results.mean(dim=['latitude', 'longitude'])
-# pangu_vs_era5_results_mean = pangu_vs_era5_results.mean(dim=['latitude', 'longitude'])
-# ifs_hres_vs_era5_results_mean = ifs_hres_vs_era5_results.mean(dim=['latitude', 'longitude'])
-# graphcast_operational_vs_era5_results_mean = graphcast_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
-# pangu_operational_vs_era5_results_mean = pangu_operational_vs_era5_results.mean(dim=['latitude', 'longitude'])
-# era5_climatology_vs_era5_results_mean = era5_climatology_vs_era5_results.mean(dim=['latitude', 'longitude'])
-
-# graphcast_vs_ifs_analysis_results_mean = graphcast_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-# pangu_vs_ifs_analysis_results_mean = pangu_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-# ifs_hres_vs_ifs_analysis_results_mean = ifs_hres_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-# graphcast_operational_vs_ifs_analysis_results_mean = graphcast_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-# pangu_operational_vs_ifs_analysis_results_mean = pangu_operational_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-# era5_climatology_vs_ifs_analysis_results_mean = era5_climatology_vs_ifs_analysis_results.mean(dim=['latitude', 'longitude'])
-
 # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
 # Create the figure and subplots
 fig, axes = plt.subplots(1, len(variables[:-1]), figsize=(16, 5))
@@ -630,7 +615,7 @@ plt.tight_layout(rect=[0, 0.1, 1, 1])
 
 plt.savefig('plots/scatterplot_ens_vs_hres.png', facecolor='white', edgecolor='none', bbox_inches='tight')
 
-# ----------------------------- Boxplots of p-values with with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
+# ----------------------------- Boxplots of p-values with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
 # Create a figure with one subplot per variable (sharing y-axis for consistency)
 fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
 

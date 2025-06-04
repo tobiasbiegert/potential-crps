@@ -1,30 +1,6 @@
 """
 This script computes in-sample IDR CRPS results and time measurements. 
-
-Example usage on Google Cloud Platform (GCP) with Apache Beam and Dataflow:
-
-python pc/compute_pc.py \
---prediction_path=gs://weatherbench2/datasets/graphcast/2020/date_range_2019-11-16_2021-02-01_12_hours-240x121_equiangular_with_poles_conservative.zarr \
---target_path=gs://weatherbench2/datasets/era5/1959-2023_01_10-6h-240x121_equiangular_with_poles_conservative.zarr \
---output_path=gs://$BUCKET/easyuq/pc/graphcast_240x121_vs_era5.zarr \
---variables=2m_temperature,mean_sea_level_pressure,10m_wind_speed,total_precipitation_24hr \
---time_start=2020-01-01 \
---time_stop=2020-12-31 \
---skip_non_headline=True \
---chunk_size_lon=8 \
---chunk_size_lat=11 \
---runner=DataflowRunner \
--- \
---project=$PROJECT \
---region=$REGION \
---job_name=compute-pc-graphcast-240x121-vs-era5 \
---temp_location=gs://$BUCKET/tmp/ \
---staging_location=gs://$BUCKET/staging/ \
---setup_file=./setup.py \
---worker_machine_type=c3-standard-8 \
---autoscaling_algorithm=THROUGHPUT_BASED
 """
-
 import logging
 from absl import app
 from absl import flags

@@ -99,30 +99,7 @@ for model_name, path in models_vs_era5.items():
 for model_name, path in models_vs_ifs_analysis.items():
     process_model(model_name, path, ifs_analysis_pc0)
 
-"""
-Get CRPS of IFS ENS for each grid point using the official evaluation script from WeatherBench 2
-
-python weatherbench2/scripts/evaluate.py \
---forecast_path=gs://weatherbench2/datasets/ifs_ens/2018-2022-240x121_equiangular_with_poles_conservative.zarr \
---obs_path=gs://weatherbench2/datasets/era5/1959-2023_01_10-6h-240x121_equiangular_with_poles_conservative.zarr \
---climatology_path=gs://weatherbench2/datasets/era5-hourly-climatology/1990-2019_6h_240x121_equiangular_with_poles_conservative.zarr \
---output_dir=gs://$BUCKET/baseline/ \
---output_file_prefix=ifs_ens_240x121_surface_vs_era5_2020_ \
---input_chunks=init_time=1,lead_time=1 \
---eval_configs=probabilistic_spatial \
---variables=2m_temperature,mean_sea_level_pressure,10m_wind_speed,total_precipitation_24hr \
---use_beam=True \
---runner=DataflowRunner \
--- \
---project=$PROJECT \
---region=$REGION \
---job_name=evaluate-ifs-ens-240x121-vs-era5-surface \
---temp_location=gs://$BUCKET/tmp/ \
---setup_file=./wb2_eval_setup.py \
---worker_machine_type=c3-highmem-8 \
---autoscaling_algorithm=THROUGHPUT_BASED
-"""
-
+# Get CRPS of IFS ENS for each grid point.
 with ProgressBar():
     ifs_ens_vs_era5_crps = xr.open_zarr('gs://$BUCKET/baseline/ifs_ens_240x121_surface_vs_era5_2020_probabilistic_spatial.zarr', decode_timedelta=True).sel(lead_time=lead_times, metric='crps').load()
 ifs_ens_vs_era5_crps.to_netcdf('results/ifs_ens_vs_era5_crps.nc')
