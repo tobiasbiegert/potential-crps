@@ -1,22 +1,27 @@
-# WeatherBench 1
+# Weather Benchmark (WB) Analysis
 
 This repository contains code for analyzing and comparing different weather forecast models using various meteorological metrics.
 
 ## Setup and Usage
 
-1. First, download the required data by running:
+1. Install the required Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+2. Download the required data by running:
 ```bash
 ./download_wb1.sh
 ```
 This will download the necessary weather data files into the `./wb_data/` directory.
 
-2. Compute the metrics for all models by running:
+3. Compute the metrics for all models by running:
 ```bash
 python compute_metrics.py
 ```
 This will calculate various metrics (RMSE, CPA, PC, PCS, ACC) for each model and save the results in the `./metrics/` directory.
 
-3. Generate visualizations by running:
+4. Generate visualizations by running:
 ```bash
 python visualization.py
 ```
