@@ -1,6 +1,6 @@
-# WeatherBench 2
+# WeatherBench 2 Analysis
 
-This directory contains code for analyzing and comparing different WeatherBench2 forecast models using PC and PCS.
+This directory contains code for analyzing and comparing different WeatherBench 2 forecast models using PC and PCS.
 
 ## Prerequisites
 
@@ -62,6 +62,7 @@ python construct_era5_climatology_forecasts.py
 ```
 
 4. Fit EasyUQ and compute CRPS.
+   
    Example usage on Google Cloud Platform (GCP) with Apache Beam and Dataflow (Replace `$PROJECT`, `$BUCKET`, and `$REGION` with your GCP project ID, bucket name, and region):
 ```bash
 python pc/compute_pc.py \
@@ -85,7 +86,7 @@ python pc/compute_pc.py \
 --autoscaling_algorithm=THROUGHPUT_BASED
 ```
 For the deterministic ERA5 climatology this is done locally using DirectRunner since the forecasts are locally in `./data/`. 
-But this can be done for every model if no GCP should be used.
+But this can be done for every model if GCP is not accessible.
 ```bash
 python pc/compute_pc.py \
 --prediction_path=/data/era5_climatology_forecasts.zarr \
