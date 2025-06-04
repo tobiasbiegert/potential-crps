@@ -9,8 +9,6 @@ import xarray as xr
 import numpy as np
 import isodisreg
 from isodisreg import idr
-from scipy import stats
-import scipy
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import rankdata
@@ -18,6 +16,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, Tuple, Union
 from dataclasses import dataclass
+import argparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -50,7 +49,7 @@ class MetricComputer:
     @staticmethod
     def cpa(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Coefficient of Predictive Ability.
+        Compute Centered Pattern Accuracy.
         
         Args:
             obs: Observed values
@@ -137,7 +136,7 @@ class MetricComputer:
     @staticmethod
     def pc(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Potential Continuous Ranked Probility Score using isotonic distributional regression.
+        Compute Pattern Correlation using isotonic distributional regression.
         
         Args:
             obs: Observed values
@@ -166,7 +165,7 @@ class MetricComputer:
     @staticmethod
     def pcs(obs: np.ndarray, fct: np.ndarray) -> float:
         """
-        Compute Potential Continuous Ranked Probility Skill Score.
+        Compute Pattern Correlation Skill score.
         
         Args:
             obs: Observed values
@@ -439,21 +438,25 @@ class WeatherDataLoader:
 def main():
     """Main function to run the metric computation pipeline."""
     
-    # Use relative paths
-    base_dir = "./wb_data"
-    output_dir = "./metrics"
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Compute weather forecast metrics')
+    parser.add_argument('--base_dir', type=str, default='./wb_data',
+                      help='Base directory containing weather data (default: ./wb_data)')
+    parser.add_argument('--output_dir', type=str, default='./metrics',
+                      help='Directory to save computed metrics (default: ./metrics)')
+    args = parser.parse_args()
     
-    logger.info(f"Base directory: {base_dir}")
-    logger.info(f"Output directory: {output_dir}")
+    logger.info(f"Base directory: {args.base_dir}")
+    logger.info(f"Output directory: {args.output_dir}")
     
     # Initialize components
-    data_loader = WeatherDataLoader(base_dir)
-    metric_computer = MetricComputer(output_dir)
+    data_loader = WeatherDataLoader(args.base_dir)
+    metric_computer = MetricComputer(args.output_dir)
     
     try:
         # Load climatology for ACC computation
         clim_data = None
-        clim_file = Path(base_dir) / "weekly_climatology_5.625.nc"
+        clim_file = Path(args.base_dir) / "weekly_climatology_5.625.nc"
         if clim_file.exists():
             logger.info("Loading climatology data...")
             clim_data = xr.open_dataset(clim_file)
@@ -462,31 +465,31 @@ def main():
         model_configs = [
             ModelConfig(
                 name="CNN",
-                file_path=str(Path(base_dir) / "fccnn_3d.nc"),
+                file_path=str(Path(args.base_dir) / "fccnn_3d.nc"),
                 variable_name='t'
             ),
             
             ModelConfig(
                 name="Persistence",
-                file_path=str(Path(base_dir) / "persistence_5.625.nc"),
+                file_path=str(Path(args.base_dir) / "persistence_5.625.nc"),
                 variable_name='t'
             ),
             
             ModelConfig(
                 name="LinearRegression",
-                file_path=str(Path(base_dir) / "lr_3d_t_t.nc"),
+                file_path=str(Path(args.base_dir) / "lr_3d_t_t.nc"),
                 variable_name='t'
             ),
             
             ModelConfig(
                 name="T42",
-                file_path=str(Path(base_dir) / "t42_5.625deg.nc"),
+                file_path=str(Path(args.base_dir) / "t42_5.625deg.nc"),
                 variable_name='t'
             ),
             
             ModelConfig(
                 name="T63",
-                file_path=str(Path(base_dir) / "t63_5.625deg.nc"),
+                file_path=str(Path(args.base_dir) / "t63_5.625deg.nc"),
                 variable_name='t'
             )
         ]
