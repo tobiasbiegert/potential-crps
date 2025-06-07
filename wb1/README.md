@@ -1,4 +1,4 @@
-# Weather Benchmark (WB) Analysis
+# WeatherBench Analysis
 
 This repository contains code for analyzing and comparing different weather forecast models using various meteorological metrics.
 
