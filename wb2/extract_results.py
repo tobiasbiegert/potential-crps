@@ -27,6 +27,7 @@ models_vs_era5 = {
     'pangu_operational_vs_era5':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_era5.zarr',
     'ifs_hres_vs_era5':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
     'era5_climatology_vs_era5':      'results/era5_climatology_240x121_vs_era5.zarr',
+    'fuxi_vs_era5':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_era5.zarr',
 }
 
 models_vs_ifs_analysis = {
@@ -36,6 +37,7 @@ models_vs_ifs_analysis = {
     'pangu_operational_vs_ifs_analysis':     'gs://$BUCKET/easyuq/pc/pangu_operational_240x121_vs_ifs_analysis.zarr',
     'ifs_hres_vs_ifs_analysis':              'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
     'era5_climatology_vs_ifs_analysis':      'results/era5_climatology_240x121_vs_ifs_analysis.zarr',
+    'fuxi_vs_ifs_analysis':                  'gs://$BUCKET/easyuq/pc/ifs_hres_240x121_vs_ifs_analysis.zarr',
 }
 
 # PC^0

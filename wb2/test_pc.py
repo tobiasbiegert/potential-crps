@@ -145,13 +145,69 @@ chunking_dict = {'longitude':8}
 graphcast_vs_era5_crps = xr.open_dataset('results/graphcast_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 pangu_vs_era5_crps = xr.open_dataset('results/pangu_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 ifs_hres_vs_era5_crps = xr.open_dataset('results/ifs_hres_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+fuxi_vs_era5_crps = xr.open_dataset('results/fuxi_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 
 graphcast_vs_ifs_analysis_crps = xr.open_dataset('results/graphcast_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 pangu_vs_ifs_analysis_crps = xr.open_dataset('results/pangu_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 ifs_hres_vs_ifs_analysis_crps = xr.open_dataset('results/ifs_hres_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+fuxi_vs_ifs_analysis_crps = xr.open_dataset('results/fuxi_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
 
 # Run model-pair comparisons
 # precipitation is omitted if one of the models (depending on reference) does not include it
+
+# FuXi vs GraphCast (ERA5 ground truth)
+with ProgressBar():
+    fuxi_graphcast_vs_era5_p = block_permutation_test_dataset(
+        fuxi_vs_era5_crps, 
+        graphcast_vs_era5_crps.sel(time=fuxi_vs_era5_crps.time), # FuXi forecasts only available until 2020-12-16T12:00:00.00 (702 time steps)
+        variables=variables[:-1]
+        ).compute()
+fuxi_graphcast_vs_era5_p.to_netcdf('results/fuxi_graphcast_vs_era5_p.nc')
+
+# FuXi vs GraphCast (IFS‑Analysis ground truth)
+with ProgressBar():
+    fuxi_graphcast_vs_ifs_analysis_p = block_permutation_test_dataset(
+        fuxi_vs_ifs_analysis_crps, 
+        graphcast_vs_ifs_analysis_crps.sel(time=fuxi_vs_ifs_analysis_crps.time),
+        variables=variables[:-1]
+        ).compute()
+fuxi_graphcast_vs_ifs_analysis_p.to_netcdf('results/fuxi_graphcast_vs_ifs_analysis_p.nc')
+
+# FuXi vs Pangu (ERA5 ground truth)
+with ProgressBar():
+    fuxi_pangu_vs_era5_p = block_permutation_test_dataset(
+        fuxi_vs_era5_crps, 
+        pangu_vs_era5_crps.sel(time=fuxi_vs_era5_crps.time),
+        variables=variables[:-1]
+        ).compute()
+fuxi_pangu_vs_era5_p.to_netcdf('results/fuxi_pangu_vs_era5_p.nc')
+
+# FuXi vs Pangu (IFS‑Analysis ground truth)
+with ProgressBar():
+    fuxi_pangu_vs_ifs_analysis_p = block_permutation_test_dataset(
+        fuxi_vs_ifs_analysis_crps, 
+        pangu_vs_ifs_analysis_crps.sel(time=fuxi_vs_ifs_analysis_crps.time),
+        variables=variables[:-1]
+        ).compute()
+fuxi_pangu_vs_ifs_analysis_p.to_netcdf('results/fuxi_pangu_vs_ifs_analysis_p.nc')
+
+# FuXi vs IFS‑HRES (ERA5 ground truth)
+with ProgressBar():
+    fuxi_ifs_hres_vs_era5_p = block_permutation_test_dataset(
+        fuxi_vs_era5_crps, 
+        ifs_hres_vs_era5_crps.sel(time=fuxi_vs_era5_crps.time),
+        variables=variables[:-1]
+        ).compute()
+fuxi_ifs_hres_vs_era5_p.to_netcdf('results/fuxi_ifs_hres_vs_era5_p.nc')
+
+# FuXi vs IFS‑HRES (IFS‑Analysis ground truth)
+with ProgressBar():
+    fuxi_ifs_hres_vs_ifs_analysis_p = block_permutation_test_dataset(
+        fuxi_vs_ifs_analysis_crps, 
+        ifs_hres_vs_ifs_analysis_crps.sel(time=fuxi_vs_ifs_analysis_crps.time),
+        variables=variables[:-1]
+        ).compute()
+fuxi_ifs_hres_vs_ifs_analysis_p.to_netcdf('results/fuxi_ifs_hres_vs_ifs_analysis_p.nc')
 
 # GraphCast vs Pangu (ERA5 ground truth)
 with ProgressBar():

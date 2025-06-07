@@ -51,6 +51,7 @@ ifs_hres_vs_era5_results = xr.open_dataset('results/ifs_hres_vs_era5_pc.nc', dec
 graphcast_operational_vs_era5_results = xr.open_dataset('results/graphcast_operational_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_operational_vs_era5_results = xr.open_dataset('results/pangu_operational_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 era5_climatology_vs_era5_results = xr.open_dataset('results/era5_climatology_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
+fuxi_vs_era5_results = xr.open_dataset('results/fuxi_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 
 graphcast_vs_ifs_analysis_results = xr.open_dataset('results/graphcast_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_vs_ifs_analysis_results = xr.open_dataset('results/pangu_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
@@ -58,6 +59,7 @@ ifs_hres_vs_ifs_analysis_results = xr.open_dataset('results/ifs_hres_vs_ifs_anal
 graphcast_operational_vs_ifs_analysis_results = xr.open_dataset('results/graphcast_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 pangu_operational_vs_ifs_analysis_results = xr.open_dataset('results/pangu_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 era5_climatology_vs_ifs_analysis_results = xr.open_dataset('results/era5_climatology_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
+fuxi_vs_ifs_analysis_results = xr.open_dataset('results/fuxi_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
 
 # Load in IFS ENS CRPS
 ifs_ens_vs_era5 = xr.open_dataset('results/ifs_ens_vs_era5_crps.nc', decode_timedelta=True).sel(lead_time=lead_times).load()
@@ -67,10 +69,18 @@ ifs_ens_vs_ifs_analysis = xr.open_dataset('results/ifs_ens_vs_ifs_analysis_crps.
 ifs_ens_vs_ifs_analysis_crps = ifs_ens_vs_ifs_analysis.rename({'lead_time':'prediction_timedelta'}).transpose(*ifs_hres_vs_ifs_analysis_results.sel(metric="pc").dims)
 
 # Load in p-values
+fuxi_graphcast_vs_era5_p = xr.open_dataset('results/fuxi_graphcast_vs_era5_p.nc', decode_timedelta=True).load()
+fuxi_graphcast_vs_ifs_analysis_p = xr.open_dataset('results/fuxi_graphcast_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
+fuxi_pangu_vs_era5_p = xr.open_dataset('results/fuxi_pangu_vs_era5_p.nc', decode_timedelta=True).load()
+fuxi_pangu_vs_ifs_analysis_p = xr.open_dataset('results/fuxi_pangu_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
+fuxi_ifs_hres_vs_era5_p = xr.open_dataset('results/fuxi_ifs_hres_vs_era5_p.nc', decode_timedelta=True).load()
+fuxi_ifs_hres_vs_ifs_analysis_p = xr.open_dataset('results/fuxi_ifs_hres_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
+
 graphcast_pangu_vs_era5_p = xr.open_dataset('results/graphcast_pangu_vs_era5_p.nc', decode_timedelta=True).load()
 graphcast_pangu_vs_ifs_analysis_p = xr.open_dataset('results/graphcast_pangu_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
 graphcast_ifs_hres_vs_era5_p = xr.open_dataset('results/graphcast_ifs_hres_vs_era5_p.nc', decode_timedelta=True).load()
 graphcast_ifs_hres_vs_ifs_analysis_p = xr.open_dataset('results/graphcast_ifs_hres_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
+
 pangu_hres_vs_era5_p = xr.open_dataset('results/pangu_hres_vs_era5_p.nc', decode_timedelta=True).load()
 pangu_hres_vs_ifs_analysis_p = xr.open_dataset('results/pangu_hres_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
 
@@ -81,6 +91,7 @@ ifs_hres_vs_era5_results_spatial_avg = ifs_hres_vs_era5_results.map(_spatial_ave
 graphcast_operational_vs_era5_results_spatial_avg = graphcast_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 pangu_operational_vs_era5_results_spatial_avg = pangu_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 era5_climatology_vs_era5_results_spatial_avg = era5_climatology_vs_era5_results.map(_spatial_average, region=None, skipna=False)
+fuxi_vs_era5_results_spatial_avg = fuxi_vs_era5_results.map(_spatial_average, region=None, skipna=False)
 
 graphcast_vs_ifs_analysis_results_spatial_avg = graphcast_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 pangu_vs_ifs_analysis_results_spatial_avg = pangu_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
@@ -88,6 +99,7 @@ ifs_hres_vs_ifs_analysis_results_spatial_avg = ifs_hres_vs_ifs_analysis_results.
 graphcast_operational_vs_ifs_analysis_results_spatial_avg = graphcast_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 pangu_operational_vs_ifs_analysis_results_spatial_avg = pangu_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 era5_climatology_vs_ifs_analysis_results_spatial_avg = era5_climatology_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
+fuxi_vs_ifs_analysis_results_spatial_avg = fuxi_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
 
 # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
 # Create the figure and subplots
@@ -141,6 +153,8 @@ for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:
             pangu_vs_era5_results_spatial_avg.sel(metric='pc')[var], color='tab:orange')
     ax.plot(lead_time_days,
             graphcast_vs_era5_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var], color='tab:green')
+    ax.plot(lead_time_days,
+            fuxi_vs_era5_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var], color='tab:pink')
 
     ax.set_xlabel('Lead Time [d]', fontsize=18)
     ax.set_title(title, fontsize=22)
@@ -163,6 +177,9 @@ for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:
     ax.plot(lead_time_days,
             graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
             label='GC-ERA5', color='tab:green')
+    ax.plot(lead_time_days,
+            fuxi_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
+            label='FuXi-ERA5', color='tab:pink')
 
     ax.set_xlabel('Lead Time [d]', fontsize=18)
     ax.set_title(title, fontsize=22)
@@ -218,24 +235,24 @@ legend_order = [
 ordered_handles = [combined_legend[label] for label in legend_order if label in combined_legend]
 ordered_labels  = [label for label in legend_order if label in combined_legend]
 
-fig.legend(ordered_handles, ordered_labels, loc='lower center', ncol=6, 
-           bbox_to_anchor=(0.5, -0.075), fontsize=20, columnspacing=1.5)
+fig.legend(ordered_handles, ordered_labels, loc='lower center', ncol=7, 
+           bbox_to_anchor=(0.5, -0.075), fontsize=18, columnspacing=1)
 
 plt.savefig('plots/lineplot_lat_mean_pc.png', facecolor='white', edgecolor='none', bbox_inches='tight')
 
 # ----------- Map plot for Skill of GraphCast with ERA5 as ground truth. ------------------ #
-# Create a meshgrid for plotting
+# Calculate skill compared to ERA5 climatology
 skill = (era5_climatology_vs_era5_results.sel(metric='pc') - graphcast_vs_era5_results.sel(metric='pc')) / era5_climatology_vs_era5_results.sel(metric='pc')
-
+# minimum skill (-0.61945444)
 vmin = min([skill[var].min() for var in variables[:-1]])
-
-n_colors = 256
+# number of color shades
+n_colors = 512
 # fraction of the range that is negative:
 frac_neg = -vmin / (1.0 - vmin)
 # number of discrete colors for negative side
 n_neg = int(np.round(frac_neg * n_colors))
 n_neg = np.clip(n_neg, 1, n_colors-1)
-
+# Colormaps
 neg_cmap = plt.cm.OrRd(np.linspace(0, 1, n_neg))      # reversed Reds: red→light
 pos_cmap = plt.cm.viridis(np.linspace(0, 1, n_colors - n_neg))
 combined_cmap = np.vstack([neg_cmap, pos_cmap])
@@ -243,6 +260,7 @@ combined_cmap = np.vstack([neg_cmap, pos_cmap])
 cmap = mcolors.ListedColormap(combined_cmap)
 norm = mcolors.Normalize(vmin=vmin, vmax=1)
 
+# Create a meshgrid for plotting
 lon = era5_pc0['longitude'].values
 lat = era5_pc0['latitude'].values
 lon_grid, lat_grid = np.meshgrid(lon, lat)
@@ -288,6 +306,50 @@ for i, lt in enumerate(lead_times):
     )
 
 plt.savefig('plots/maps_graphcast_vs_era5_skill.png', facecolor='white', edgecolor='none', bbox_inches='tight')
+
+# ----------- Map plot for Skill of FuXi with ERA5 as ground truth. ------------------ #
+# Calculate skill compared to ERA5 climatology
+skill = (era5_climatology_vs_era5_results.sel(metric='pc') - fuxi_vs_era5_results.sel(metric='pc')) / era5_climatology_vs_era5_results.sel(metric='pc')
+# Use same Colormap as in GraphCast plot (minimum skill of FuXi is -0.3405793)
+
+# Create a grid of subplots with one row per lead time and one column per variable
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 6, n_rows * 4), subplot_kw={'projection': ccrs.Robinson()}, constrained_layout=True)
+
+for i, lt in enumerate(lead_times):
+    # Convert lead time to days for the row label
+    lt_days = int(lt / np.timedelta64(1, 'D'))
+    
+    for j, (var, var_title) in enumerate(zip(variables[:-1], titles[:-1])):
+        ax = axes[i, j]
+        ax.coastlines()
+        
+        # Select the data for the variable at the given lead time
+        data = skill.sel(prediction_timedelta=lt)[var]
+        
+        # Plot the data
+        mesh = ax.pcolormesh(lon_grid, lat_grid, data.T, cmap=cmap, norm=norm, transform=ccrs.PlateCarree(), linewidth=0.5)
+        
+        # Every subplot gets its variable title on top
+        ax.set_title(var_title, fontsize=24)
+        
+        # If this is the bottom row, add an x-axis label and the colorbar
+        if i == n_rows - 1:
+            ax.set_xlabel('Longitude')
+            cbar = plt.colorbar(mesh, ax=ax, orientation='horizontal', shrink=0.75, pad=0.1)
+            cbar.ax.tick_params(labelsize=18)
+            cbar.set_label('$\\text{Skill}^{(\\text{FuXi-ERA5})}$', fontsize=22)
+    
+    # Annotate the left-most subplot of the current row with the lead time information.
+    axes[i, 0].annotate(
+        f"Lead Time: {lt_days} day" if i==0 else f"Lead Time: {lt_days} days",
+        fontsize=22,
+        xy=(-0.1, 0.5), 
+        xycoords='axes fraction',
+        rotation=90, 
+        va='center'
+    )
+
+plt.savefig('plots/maps_fuxi_vs_era5_skill.png', facecolor='white', edgecolor='none', bbox_inches='tight')
 
 # ----------- Map plot for PCS of GraphCast with ERA5 as ground truth. ------------------ #
 # Create a meshgrid for plotting
@@ -749,3 +811,138 @@ legend_handles = [
 fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
 
 plt.savefig('plots/boxplot_pvalues.png', facecolor='white', edgecolor='none', bbox_inches='tight')
+
+# ----------------------------- Boxplots of p-values for FuXi vs other models with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
+# Create a figure with one subplot per variable (sharing y-axis for consistency)
+fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
+
+# ----------------------- Ground Truth Era5 -----------------------
+for ax, var, title in zip(axes[0, :], variables[:-1], titles[:-1]):
+    # Lists for boxplot positions and data per model
+    positions_1 = []
+    positions_2 = []
+    positions_3 = []
+    data_1 = []
+    data_2 = []
+    data_3 = []
+    x_ticks = []
+    offset = 0.3  
+
+    # Loop over each lead time
+    for lt in lead_times:
+        lt_days = int(lt / np.timedelta64(1, 'D'))
+        x_ticks.append(lt_days)
+        
+        # Get p-values
+        d1 = fuxi_graphcast_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        d2 = fuxi_pangu_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        d3 = fuxi_ifs_hres_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        
+        data_1.append(d1)
+        data_2.append(d2)
+        data_3.append(d3)
+        
+        # Define positions for each model's boxplot
+        positions_1.append(lt_days - offset)
+        positions_2.append(lt_days)
+        positions_3.append(lt_days + offset)
+
+    boxplot_kwargs = dict(
+        widths=0.2,
+        patch_artist=True,
+        medianprops=dict(color='black'),
+        showfliers=False  # hide outliers
+    )
+    
+    # Plot the boxplots for each model
+    ax.boxplot(data_1, positions=positions_1, boxprops=dict(facecolor='tab:green'), **boxplot_kwargs)
+    ax.boxplot(data_2, positions=positions_2, boxprops=dict(facecolor='tab:blue'), **boxplot_kwargs)
+    ax.boxplot(data_3, positions=positions_3, boxprops=dict(facecolor='tab:orange'), **boxplot_kwargs)
+    
+    ax.set_xlabel('Lead Time [d]', fontsize=18)
+    ax.set_title(title, fontsize=22)
+    ax.set_xticks(x_ticks)
+    ax.tick_params(axis='both', which='major', labelsize=17)
+    ax.set_xticklabels([str(x) for x in x_ticks])
+    if title=='MSLP':
+        ax.set_ylabel('p-Value', fontsize=18)  
+
+# ----------------------- Ground Truth IFS Analysis -----------------------
+for ax, var, title in zip(axes[1, :], variables[:-1], titles[:-1]):
+
+    positions_1 = []
+    positions_2 = []
+    positions_3 = []
+    data_1 = []
+    data_2 = []
+    data_3 = []
+    x_ticks = []
+    offset = 0.3  
+
+    for lt in lead_times:
+        lt_days = int(lt / np.timedelta64(1, 'D'))
+        x_ticks.append(lt_days)
+        
+        d1 = fuxi_graphcast_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        d2 = fuxi_pangu_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        d3 = fuxi_ifs_hres_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+        
+        data_1.append(d1)
+        data_2.append(d2)
+        data_3.append(d3)
+        
+        positions_1.append(lt_days - offset)
+        positions_2.append(lt_days)
+        positions_3.append(lt_days + offset)
+
+    boxplot_kwargs = dict(
+        widths=0.2,
+        patch_artist=True,
+        medianprops=dict(color='black'),
+        showfliers=False
+    )
+    
+    ax.boxplot(data_1, positions=positions_1, boxprops=dict(facecolor='tab:green'), **boxplot_kwargs)
+    ax.boxplot(data_2, positions=positions_2, boxprops=dict(facecolor='tab:blue'), **boxplot_kwargs)
+    ax.boxplot(data_3, positions=positions_3, boxprops=dict(facecolor='tab:orange'), **boxplot_kwargs)
+    
+    ax.set_xlabel('Lead Time [d]', fontsize=18)
+    ax.set_title(title, fontsize=22)
+    ax.set_xticks(x_ticks)
+    ax.tick_params(axis="both", which="major", labelsize=17)
+    ax.set_xticklabels([str(x) for x in x_ticks])
+    if title=='MSLP':
+        ax.set_ylabel('p-Value', fontsize=18)    
+
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.4)
+
+# ----------------------- Row Titles -----------------------
+# Upper row:
+row1_left = axes[0, 0].get_position().x0
+row1_right = axes[0, -1].get_position().x1
+row1_top = axes[0, 0].get_position().y1
+row1_center_x = (row1_left + row1_right) / 2
+
+# Lower row:
+row2_left = axes[1, 0].get_position().x0
+row2_right = axes[1, -1].get_position().x1
+row2_top = axes[1, 0].get_position().y1
+row2_center_x = (row2_left + row2_right) / 2
+
+# Place the row titles at some vertical offset above each row
+fig.text(row1_center_x, row1_top + 0.04, "Ground Truth: ERA5", 
+         ha='center', va='bottom', fontsize=22)
+fig.text(row2_center_x, row2_top + 0.04, "Ground Truth: IFS Analysis", 
+         ha='center', va='bottom', fontsize=22)
+
+# Shared legend
+legend_handles = [
+    Patch(facecolor='tab:green', label='FuXi-ERA5 vs GC-ERA5'),
+    Patch(facecolor='tab:blue', label='FuXi-ERA5 vs PW-ERA5'),
+    Patch(facecolor='tab:orange', label='FuXi-ERA5 vs HRES')
+]
+
+fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
+
+plt.savefig('plots/boxplot_pvalues_fuxi.png', facecolor='white', edgecolor='none', bbox_inches='tight')
