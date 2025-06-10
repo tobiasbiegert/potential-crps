@@ -11,9 +11,9 @@ Applications in this repo include:
 For detailed instructions, see each subdirectory’s README.
 
 ## Paper
-**Gneiting, T., et al. (2025).** Probabilistic measures afford fair comparisons of AIWP and NWP model output. Preprint available on [arXiv:2506.03744](https://arxiv.org/abs/2506.03744).
+**Gneiting et al. (2025).** Probabilistic measures afford fair comparisons of AIWP and NWP model output. Preprint available on [arXiv:2506.03744](https://arxiv.org/abs/2506.03744).
 
-### BibTeX
+### Citation
 ```bibtex
 @misc{gneiting2025probabilisticmeasuresaffordfair,
       title={Probabilistic measures afford fair comparisons of AIWP and NWP model output}, 
