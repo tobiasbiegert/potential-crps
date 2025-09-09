@@ -137,7 +137,7 @@ python extract_results.py
 python test_pc.py
 ```
 
-8. Compute ACC, CPA, PCRPS, PCRPS-S, and RMSE for 3-day T850 forecasts. This is done to directly compare to the results in `wb1/`. This script can also be used to compute these metrics for any single combination of variable, level and lead time. But the PCRPS-S implementation is not as efficient and as general as the implementation using Apache Beam.
+8. Compute ACC, CPA, PCRPS, PCRPS-S, and RMSE for 3-day T850 forecasts. This is done to directly compare to the results in `wb1/`. This script can also be used to compute these metrics for any single combination of variable, level and lead time. But the PCRPS implementation is not as efficient and as general as the implementation using Apache Beam.
 ```bash
 python compute_metrics.py
 ```
