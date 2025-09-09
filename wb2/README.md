@@ -1,6 +1,6 @@
 # WeatherBench 2 Analysis
 
-This directory contains code for analyzing and comparing different WeatherBench 2 forecast models using PC and PCS.
+This directory contains code for analyzing and comparing different WeatherBench 2 forecast models using PCRPS and PCRPS-S.
 
 ## Prerequisites
 
@@ -35,12 +35,13 @@ The code is written in Python and uses the following libraries (as specified in 
 - `./results/`: Contains the results.
 - `./plots/`: Contains the visualizations.
 - `./pc/`
-  - `compute_pc0.py`: Computes $\text{PC}^{(0)}$ for ERA5 and the IFS analysis.
-  - `compute_pc.py`: Script to compute PC for any model.
-  - `easyuq_helper.py`: Helper module for computing PC.
+  - `compute_pc0.py`: Computes $\text{PCRPS}^{(0)}$ for ERA5 and the IFS analysis.
+  - `compute_pc.py`: Script to compute PCRPS for any model.
+  - `easyuq_helper.py`: Helper module for computing PCRPS.
 - `./construct_era5_climatology_forecasts.py`: Constructs ERA5 deterministic climatological forecasts.
+- `./compute_metrics.py`: Script to compute different metrics for 3-day T850 forecasts.
 - `./create_plots.py`: Generates plots.
-- `./extract_results.py`: Downloads results from GCP and transform them.
+- `./extract_results.py`: Downloads results from GCP and transforms them.
 - `./requirements.txt`: Local installation requirements.
 - `./setup.py`: Installation requirements for GCP workers.
 - `./test_pc.py`: Runs block permutation tests for statistical significance between model pairs.
@@ -51,7 +52,7 @@ The code is written in Python and uses the following libraries (as specified in 
 pip install -r requirements.txt
 ```
 
-2. Compute $\text{PC}^{(0)}$ for ERA5 and the IFS analysis:
+2. Compute $\text{PCRPS}^{(0)}$ for ERA5 and the IFS analysis:
 ```bash
 python pc/compute_pc0.py
 ```
@@ -85,7 +86,7 @@ python pc/compute_pc.py \
 --worker_machine_type=c3-standard-8 \
 --autoscaling_algorithm=THROUGHPUT_BASED
 ```
-For the deterministic ERA5 climatology this is done locally using DirectRunner since the forecasts are locally in `./data/`. 
+For the deterministic ERA5 climatology, this is done locally using DirectRunner since the forecasts are locally in `./data/`. 
 But this can be done for every model if GCP is not accessible.
 ```bash
 python pc/compute_pc.py \
@@ -126,7 +127,7 @@ python weatherbench2/scripts/evaluate.py \
 --autoscaling_algorithm=THROUGHPUT_BASED
 ```
 
-6. Download CRPS results and time measurements from GCP bucket (or local `./results/` directory), compute PC, PCS and save results:
+6. Download CRPS results and time measurements from GCP bucket (or local `./results/` directory), compute PCRPS, PCRPS-S, and save results:
 ```bash
 python extract_results.py
 ```
@@ -136,7 +137,12 @@ python extract_results.py
 python test_pc.py
 ```
 
-8. Generate plots:
+8. Compute ACC, CPA, PCRPS, PCRPS-S, and RMSE for 3-day T850 forecasts. This is done to directly compare to the results in `wb1/`. This script can also be used to compute these metrics for any single combination of variable, level and lead time. But the PCRPS-S implementation is not as efficient and as general as the implementation using Apache Beam.
+```bash
+python compute_metrics.py
+```
+
+9. Generate plots:
 ```bash
 python create_plots.py
 ```
