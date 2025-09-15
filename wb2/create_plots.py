@@ -243,453 +243,453 @@ def main():
     plt.savefig('plots/lon_mean_metrics_72h_T850.pdf', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close(fig)
     
-    # # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
-    # # Create the figure and subplots
-    # fig, axes = plt.subplots(1, len(variables[:-1]), figsize=(16, 5))
-    # plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
+    # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
+    # Create the figure and subplots
+    fig, axes = plt.subplots(1, len(variables[:-1]), figsize=(16, 5))
+    plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
     
-    # # ----------------------- Ground Truth IFS Analysis -----------------------
-    # for ax, var, title, unit in zip(axes, variables[:-1], titles[:-1], units[:-1]):
-    #     ax.plot(
-    #         lead_time_days, 
-    #         ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
-    #         label='HRES', 
-    #         color=oi_cmap['HRES'],
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days, 
-    #         pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
-    #         label='PW-IFS', 
-    #         color=oi_cmap['PW'],
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days, 
-    #         graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
-    #         label='GC-IFS', 
-    #         color=oi_cmap['GC'],
-    #         **plot_kwargs
-    #     )
+    # ----------------------- Ground Truth IFS Analysis -----------------------
+    for ax, var, title, unit in zip(axes, variables[:-1], titles[:-1], units[:-1]):
+        ax.plot(
+            lead_time_days, 
+            ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            label='HRES', 
+            color=oi_cmap['HRES'],
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days, 
+            pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            label='PW-IFS', 
+            color=oi_cmap['PW'],
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days, 
+            graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
+            label='GC-IFS', 
+            color=oi_cmap['GC'],
+            **plot_kwargs
+        )
     
-    #     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    #     ax.set_title(title, fontsize=22)
-    #     ax.set_xticks(lead_time_days)
-    #     ax.set_ylim(0)
-    #     ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
-    #     ax.tick_params(axis='both', which='major', labelsize=17)
+        ax.set_xlabel('Lead Time [d]', fontsize=18)
+        ax.set_title(title, fontsize=22)
+        ax.set_xticks(lead_time_days)
+        ax.set_ylim(0)
+        ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
+        ax.tick_params(axis='both', which='major', labelsize=17)
     
-    # plt.tight_layout()
+    plt.tight_layout()
     
-    # # ----------------------- Combined Legend --------------------------
-    # handles, labels = axes[0].get_legend_handles_labels()
-    # legend = fig.legend(
-    #     handles, labels,
-    #     loc='lower center', ncol=len(labels),
-    #     bbox_to_anchor=(0.5, -0.12), fontsize=22
-    # )
-    # for h in legend.legend_handles:          
-    #     h.set_marker('')
+    # ----------------------- Combined Legend --------------------------
+    handles, labels = axes[0].get_legend_handles_labels()
+    legend = fig.legend(
+        handles, labels,
+        loc='lower center', ncol=len(labels),
+        bbox_to_anchor=(0.5, -0.12), fontsize=22
+    )
+    for h in legend.legend_handles:          
+        h.set_marker('')
         
-    # plt.savefig('plots/lineplot_operational_spatial_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
-    # plt.close(fig)
+    plt.savefig('plots/lineplot_operational_spatial_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.close(fig)
     
-    # # -------- Line plot for PC of WeatherBench 2 models with ERA5 (top) and IFS analysis (bottom) as ground truth, latitude weighted mean ---------- #
-    # # Create the figure and subplots
-    # fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
-    # plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
+    # -------- Line plot for PC of WeatherBench 2 models with ERA5 (top) and IFS analysis (bottom) as ground truth, latitude weighted mean ---------- #
+    # Create the figure and subplots
+    fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
+    plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
     
-    # # ----------------------- Ground Truth Era5 -----------------------
-    # for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:-1]):
-    #     ax.plot(
-    #         lead_time_days,
-    #         era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-    #         label='ERA5 $\\text{PC}^{(0)}$',
-    #         color=oi_cmap['ERA5_PC0'],
-    #         linestyle='--',
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var],
-    #         label='ERA5 Climatology', 
-    #         color=oi_cmap['ERA5 Climatology'],
-    #         linestyle='--',
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         ifs_hres_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
-    #         color=oi_cmap['HRES'],
-    #         **plot_kwargs    
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         pangu_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
-    #         color=oi_cmap['PW'],
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         graphcast_vs_era5_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var], 
-    #         color=oi_cmap['GC'],
-    #         **plot_kwargs
-    #     )
+    # ----------------------- Ground Truth Era5 -----------------------
+    for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:-1]):
+        ax.plot(
+            lead_time_days,
+            era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
+            label='ERA5 $\\text{PC}^{(0)}$',
+            color=oi_cmap['ERA5_PC0'],
+            linestyle='--',
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var],
+            label='ERA5 Climatology', 
+            color=oi_cmap['ERA5 Climatology'],
+            linestyle='--',
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            ifs_hres_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
+            color=oi_cmap['HRES'],
+            **plot_kwargs    
+        )
+        ax.plot(
+            lead_time_days,
+            pangu_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
+            color=oi_cmap['PW'],
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            graphcast_vs_era5_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var], 
+            color=oi_cmap['GC'],
+            **plot_kwargs
+        )
     
-    #     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    #     ax.set_title(title, fontsize=22)
-    #     ax.set_xticks(lead_time_days)
-    #     ax.set_ylim(0)
-    #     ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
-    #     ax.tick_params(axis='both', which='major', labelsize=17)
+        ax.set_xlabel('Lead Time [d]', fontsize=18)
+        ax.set_title(title, fontsize=22)
+        ax.set_xticks(lead_time_days)
+        ax.set_ylim(0)
+        ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
+        ax.tick_params(axis='both', which='major', labelsize=17)
     
-    # # ----------------------- Ground Truth IFS Analysis -----------------------
-    # for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:-1]):
-    #     ax.plot(
-    #         lead_time_days,
-    #         ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-    #         label='IFS Analysis $\\text{PC}^{(0)}$', 
-    #         color=oi_cmap['IFS_PC0'],
-    #         linestyle='--',
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
-    #         label='HRES', 
-    #         color=oi_cmap['HRES'],
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
-    #         label='PW-ERA5', 
-    #         color=oi_cmap['PW'],
-    #         **plot_kwargs
-    #     )
-    #     ax.plot(
-    #         lead_time_days,
-    #         graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
-    #         label='GC-ERA5', 
-    #         color=oi_cmap['GC'],
-    #         **plot_kwargs
-    #     )
+    # ----------------------- Ground Truth IFS Analysis -----------------------
+    for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:-1]):
+        ax.plot(
+            lead_time_days,
+            ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
+            label='IFS Analysis $\\text{PC}^{(0)}$', 
+            color=oi_cmap['IFS_PC0'],
+            linestyle='--',
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            label='HRES', 
+            color=oi_cmap['HRES'],
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            label='PW-ERA5', 
+            color=oi_cmap['PW'],
+            **plot_kwargs
+        )
+        ax.plot(
+            lead_time_days,
+            graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
+            label='GC-ERA5', 
+            color=oi_cmap['GC'],
+            **plot_kwargs
+        )
     
-    #     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    #     ax.set_title(title, fontsize=22)
-    #     ax.set_xticks(lead_time_days)
-    #     ax.set_ylim(0)
-    #     ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
-    #     ax.tick_params(axis='both', which='major', labelsize=17)
+        ax.set_xlabel('Lead Time [d]', fontsize=18)
+        ax.set_title(title, fontsize=22)
+        ax.set_xticks(lead_time_days)
+        ax.set_ylim(0)
+        ax.set_ylabel('Latitude-Weighted PCRPS ' + unit, fontsize=18)
+        ax.tick_params(axis='both', which='major', labelsize=17)
     
-    # plt.tight_layout()
-    # plt.subplots_adjust(hspace=0.4)
+    plt.tight_layout()
+    plt.subplots_adjust(hspace=0.4)
     
-    # # ----------------------- Row Titles -----------------------
-    # # Upper row:
-    # row1_left = axes[0, 0].get_position().x0
-    # row1_right = axes[0, -1].get_position().x1
-    # row1_top = axes[0, 0].get_position().y1
-    # row1_center_x = (row1_left + row1_right) / 2
+    # ----------------------- Row Titles -----------------------
+    # Upper row:
+    row1_left = axes[0, 0].get_position().x0
+    row1_right = axes[0, -1].get_position().x1
+    row1_top = axes[0, 0].get_position().y1
+    row1_center_x = (row1_left + row1_right) / 2
     
-    # # Lower row:
-    # row2_left = axes[1, 0].get_position().x0
-    # row2_right = axes[1, -1].get_position().x1
-    # row2_top = axes[1, 0].get_position().y1
-    # row2_center_x = (row2_left + row2_right) / 2
+    # Lower row:
+    row2_left = axes[1, 0].get_position().x0
+    row2_right = axes[1, -1].get_position().x1
+    row2_top = axes[1, 0].get_position().y1
+    row2_center_x = (row2_left + row2_right) / 2
     
-    # # Place the row titles at some vertical offset above each row
-    # fig.text(row1_center_x, row1_top + 0.04, 'Ground Truth: ERA5', 
-    #          ha='center', va='bottom', fontsize=22)
-    # fig.text(row2_center_x, row2_top + 0.04, 'Ground Truth: IFS Analysis', 
-    #          ha='center', va='bottom', fontsize=22)
+    # Place the row titles at some vertical offset above each row
+    fig.text(row1_center_x, row1_top + 0.04, 'Ground Truth: ERA5', 
+             ha='center', va='bottom', fontsize=22)
+    fig.text(row2_center_x, row2_top + 0.04, 'Ground Truth: IFS Analysis', 
+             ha='center', va='bottom', fontsize=22)
     
-    # # ----------------------- Combined Legend --------------------------
-    # handles_upper, labels_upper = axes[0, 0].get_legend_handles_labels()
-    # handles_lower, labels_lower = axes[1, 0].get_legend_handles_labels()
+    # ----------------------- Combined Legend --------------------------
+    handles_upper, labels_upper = axes[0, 0].get_legend_handles_labels()
+    handles_lower, labels_lower = axes[1, 0].get_legend_handles_labels()
     
-    # # Combine them into a dictionary to eliminate duplicates
-    # combined_legend = {}
-    # for h, l in zip(handles_upper, labels_upper):
-    #     combined_legend[l] = h
-    # for h, l in zip(handles_lower, labels_lower):
-    #     combined_legend[l] = h
+    # Combine them into a dictionary to eliminate duplicates
+    combined_legend = {}
+    for h, l in zip(handles_upper, labels_upper):
+        combined_legend[l] = h
+    for h, l in zip(handles_lower, labels_lower):
+        combined_legend[l] = h
     
-    # legend_order = [
-    #     'ERA5 $\\text{PC}^{(0)}$',
-    #     'IFS Analysis $\\text{PC}^{(0)}$',
-    #     'ERA5 Climatology',
-    #     'HRES',
-    #     'PW-ERA5',
-    #     'GC-ERA5'
-    # ]
+    legend_order = [
+        'ERA5 $\\text{PC}^{(0)}$',
+        'IFS Analysis $\\text{PC}^{(0)}$',
+        'ERA5 Climatology',
+        'HRES',
+        'PW-ERA5',
+        'GC-ERA5'
+    ]
     
-    # # pick out handles in that order (skipping any that aren’t present)
-    # ordered_handles = [combined_legend[label] for label in legend_order if label in combined_legend]
-    # ordered_labels  = [label for label in legend_order if label in combined_legend]
+    # pick out handles in that order (skipping any that aren’t present)
+    ordered_handles = [combined_legend[label] for label in legend_order if label in combined_legend]
+    ordered_labels  = [label for label in legend_order if label in combined_legend]
     
-    # legend = fig.legend(
-    #     ordered_handles,
-    #     ordered_labels, 
-    #     loc='lower center', 
-    #     ncol=6, 
-    #     bbox_to_anchor=(0.5, -0.075), 
-    #     fontsize=20, 
-    #     columnspacing=1.5
-    # )
-    # for h in legend.legend_handles:          
-    #     h.set_marker('')
+    legend = fig.legend(
+        ordered_handles,
+        ordered_labels, 
+        loc='lower center', 
+        ncol=6, 
+        bbox_to_anchor=(0.5, -0.075), 
+        fontsize=20, 
+        columnspacing=1.5
+    )
+    for h in legend.legend_handles:          
+        h.set_marker('')
         
-    # plt.savefig('plots/lineplot_lat_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
-    # plt.close(fig)
+    plt.savefig('plots/lineplot_lat_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.close(fig)
     
-    # # ----------------------------- Boxplots of p-values with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
-    # # Create a figure with one subplot per variable
-    # fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
+    # ----------------------------- Boxplots of p-values with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
+    # Create a figure with one subplot per variable
+    fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
     
-    # boxplot_kwargs = dict(
-    #     widths=0.1,
-    #     patch_artist=True,
-    #     medianprops=dict(color='black'),
-    #     showfliers=False 
-    # )
+    boxplot_kwargs = dict(
+        widths=0.1,
+        patch_artist=True,
+        medianprops=dict(color='black'),
+        showfliers=False 
+    )
     
-    # # ----------------------- Ground Truth Era5 -----------------------
-    # for ax, var, title in zip(axes[0, :], variables[:-1], titles[:-1]):
-    #     # Lists for boxplot positions, data per model and ticks
-    #     positions_graphcast_pangu = []
-    #     positions_graphcast_hres = []
-    #     positions_pangu_hres = []
-    #     data_graphcast_pangu = []
-    #     data_graphcast_hres = []
-    #     data_pangu_hres = []
-    #     tick_positions = []   
-    #     tick_labels = []      
-    #     offset = 0.15
+    # ----------------------- Ground Truth Era5 -----------------------
+    for ax, var, title in zip(axes[0, :], variables[:-1], titles[:-1]):
+        # Lists for boxplot positions, data per model and ticks
+        positions_graphcast_pangu = []
+        positions_graphcast_hres = []
+        positions_pangu_hres = []
+        data_graphcast_pangu = []
+        data_graphcast_hres = []
+        data_pangu_hres = []
+        tick_positions = []   
+        tick_labels = []      
+        offset = 0.15
     
-    #     # Loop over each lead time
-    #     for i, lt in enumerate(lead_times):
-    #         lt_days = int(lt / np.timedelta64(1, 'D'))
-    #         tick_positions.append(i)
-    #         tick_labels.append(lt_days)
+        # Loop over each lead time
+        for i, lt in enumerate(lead_times):
+            lt_days = int(lt / np.timedelta64(1, 'D'))
+            tick_positions.append(i)
+            tick_labels.append(lt_days)
             
-    #         # Get p-values
-    #         d1 = graphcast_pangu_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
-    #         d2 = graphcast_ifs_hres_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
-    #         d3 = pangu_ifs_hres_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            # Get p-values
+            d1 = graphcast_pangu_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            d2 = graphcast_ifs_hres_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            d3 = pangu_ifs_hres_vs_era5_p.sel(prediction_timedelta=lt)[var].values.flatten()
             
-    #         data_graphcast_pangu.append(d1)
-    #         data_graphcast_hres.append(d2)
-    #         data_pangu_hres.append(d3)
+            data_graphcast_pangu.append(d1)
+            data_graphcast_hres.append(d2)
+            data_pangu_hres.append(d3)
             
-    #         # Define positions for each model's boxplot
-    #         positions_graphcast_pangu.append(i - offset)
-    #         positions_graphcast_hres.append(i)
-    #         positions_pangu_hres.append(i + offset)    
+            # Define positions for each model's boxplot
+            positions_graphcast_pangu.append(i - offset)
+            positions_graphcast_hres.append(i)
+            positions_pangu_hres.append(i + offset)    
         
-    #     # Plot the boxplots for each model
-    #     ax.boxplot(data_graphcast_pangu, positions=positions_graphcast_pangu, boxprops=dict(facecolor=oi_cmap['GC']), **boxplot_kwargs)
-    #     ax.boxplot(data_graphcast_hres, positions=positions_graphcast_hres, boxprops=dict(facecolor=oi_cmap['HRES']), **boxplot_kwargs)
-    #     ax.boxplot(data_pangu_hres, positions=positions_pangu_hres, boxprops=dict(facecolor=oi_cmap['PW']), **boxplot_kwargs)
+        # Plot the boxplots for each model
+        ax.boxplot(data_graphcast_pangu, positions=positions_graphcast_pangu, boxprops=dict(facecolor=oi_cmap['GC']), **boxplot_kwargs)
+        ax.boxplot(data_graphcast_hres, positions=positions_graphcast_hres, boxprops=dict(facecolor=oi_cmap['HRES']), **boxplot_kwargs)
+        ax.boxplot(data_pangu_hres, positions=positions_pangu_hres, boxprops=dict(facecolor=oi_cmap['PW']), **boxplot_kwargs)
         
-    #     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    #     ax.set_title(title, fontsize=22)
-    #     ax.set_xticks(tick_positions)
-    #     ax.set_xticklabels([str(x) for x in tick_labels])
-    #     ax.tick_params(axis='both', which='major', labelsize=17)
-    #     if title=='MSLP':
-    #         ax.set_ylabel('p-Value', fontsize=18)  
+        ax.set_xlabel('Lead Time [d]', fontsize=18)
+        ax.set_title(title, fontsize=22)
+        ax.set_xticks(tick_positions)
+        ax.set_xticklabels([str(x) for x in tick_labels])
+        ax.tick_params(axis='both', which='major', labelsize=17)
+        if title=='MSLP':
+            ax.set_ylabel('p-Value', fontsize=18)  
     
-    # # ----------------------- Ground Truth IFS Analysis -----------------------
-    # for ax, var, title in zip(axes[1, :], variables[:-1], titles[:-1]):
+    # ----------------------- Ground Truth IFS Analysis -----------------------
+    for ax, var, title in zip(axes[1, :], variables[:-1], titles[:-1]):
     
-    #     positions_graphcast_pangu = []
-    #     positions_graphcast_hres = []
-    #     positions_pangu_hres = []
-    #     data_graphcast_pangu = []
-    #     data_graphcast_hres = []
-    #     data_pangu_hres = []
-    #     tick_positions = [] 
-    #     tick_labels = []
-    #     offset = 0.15
+        positions_graphcast_pangu = []
+        positions_graphcast_hres = []
+        positions_pangu_hres = []
+        data_graphcast_pangu = []
+        data_graphcast_hres = []
+        data_pangu_hres = []
+        tick_positions = [] 
+        tick_labels = []
+        offset = 0.15
     
-    #     for i, lt in enumerate(lead_times):
-    #         lt_days = int(lt / np.timedelta64(1, 'D'))
-    #         tick_positions.append(i)
-    #         tick_labels.append(lt_days)
+        for i, lt in enumerate(lead_times):
+            lt_days = int(lt / np.timedelta64(1, 'D'))
+            tick_positions.append(i)
+            tick_labels.append(lt_days)
             
-    #         d1 = graphcast_pangu_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
-    #         d2 = graphcast_ifs_hres_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
-    #         d3 = pangu_ifs_hres_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            d1 = graphcast_pangu_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            d2 = graphcast_ifs_hres_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
+            d3 = pangu_ifs_hres_vs_ifs_analysis_p.sel(prediction_timedelta=lt)[var].values.flatten()
             
-    #         data_graphcast_pangu.append(d1)
-    #         data_graphcast_hres.append(d2)
-    #         data_pangu_hres.append(d3)
+            data_graphcast_pangu.append(d1)
+            data_graphcast_hres.append(d2)
+            data_pangu_hres.append(d3)
             
-    #         positions_graphcast_pangu.append(i - offset)
-    #         positions_graphcast_hres.append(i)
-    #         positions_pangu_hres.append(i + offset)
+            positions_graphcast_pangu.append(i - offset)
+            positions_graphcast_hres.append(i)
+            positions_pangu_hres.append(i + offset)
         
-    #     ax.boxplot(data_graphcast_pangu, positions=positions_graphcast_pangu, boxprops=dict(facecolor=oi_cmap['GC']), **boxplot_kwargs)
-    #     ax.boxplot(data_graphcast_hres, positions=positions_graphcast_hres, boxprops=dict(facecolor=oi_cmap['HRES']), **boxplot_kwargs)
-    #     ax.boxplot(data_pangu_hres, positions=positions_pangu_hres, boxprops=dict(facecolor=oi_cmap['PW']), **boxplot_kwargs)
+        ax.boxplot(data_graphcast_pangu, positions=positions_graphcast_pangu, boxprops=dict(facecolor=oi_cmap['GC']), **boxplot_kwargs)
+        ax.boxplot(data_graphcast_hres, positions=positions_graphcast_hres, boxprops=dict(facecolor=oi_cmap['HRES']), **boxplot_kwargs)
+        ax.boxplot(data_pangu_hres, positions=positions_pangu_hres, boxprops=dict(facecolor=oi_cmap['PW']), **boxplot_kwargs)
         
-    #     ax.set_xlabel('Lead Time [d]', fontsize=18)
-    #     ax.set_title(title, fontsize=22)
-    #     ax.set_xticks(tick_positions)
-    #     ax.set_xticklabels([str(x) for x in tick_labels])
-    #     ax.tick_params(axis='both', which='major', labelsize=17)
-    #     if title=='MSLP':
-    #         ax.set_ylabel('p-Value', fontsize=18)    
+        ax.set_xlabel('Lead Time [d]', fontsize=18)
+        ax.set_title(title, fontsize=22)
+        ax.set_xticks(tick_positions)
+        ax.set_xticklabels([str(x) for x in tick_labels])
+        ax.tick_params(axis='both', which='major', labelsize=17)
+        if title=='MSLP':
+            ax.set_ylabel('p-Value', fontsize=18)    
     
-    # plt.tight_layout()
-    # plt.subplots_adjust(hspace=0.4)
+    plt.tight_layout()
+    plt.subplots_adjust(hspace=0.4)
     
-    # # ----------------------- Row Titles -----------------------
-    # # Upper row:
-    # row1_left = axes[0, 0].get_position().x0
-    # row1_right = axes[0, -1].get_position().x1
-    # row1_top = axes[0, 0].get_position().y1
-    # row1_center_x = (row1_left + row1_right) / 2
+    # ----------------------- Row Titles -----------------------
+    # Upper row:
+    row1_left = axes[0, 0].get_position().x0
+    row1_right = axes[0, -1].get_position().x1
+    row1_top = axes[0, 0].get_position().y1
+    row1_center_x = (row1_left + row1_right) / 2
     
-    # # Lower row:
-    # row2_left = axes[1, 0].get_position().x0
-    # row2_right = axes[1, -1].get_position().x1
-    # row2_top = axes[1, 0].get_position().y1
-    # row2_center_x = (row2_left + row2_right) / 2
+    # Lower row:
+    row2_left = axes[1, 0].get_position().x0
+    row2_right = axes[1, -1].get_position().x1
+    row2_top = axes[1, 0].get_position().y1
+    row2_center_x = (row2_left + row2_right) / 2
     
-    # # Place the row titles at some vertical offset above each row
-    # fig.text(row1_center_x, row1_top + 0.04, 'Ground Truth: ERA5', 
-    #          ha='center', va='bottom', fontsize=22)
-    # fig.text(row2_center_x, row2_top + 0.04, 'Ground Truth: IFS Analysis', 
-    #          ha='center', va='bottom', fontsize=22)
+    # Place the row titles at some vertical offset above each row
+    fig.text(row1_center_x, row1_top + 0.04, 'Ground Truth: ERA5', 
+             ha='center', va='bottom', fontsize=22)
+    fig.text(row2_center_x, row2_top + 0.04, 'Ground Truth: IFS Analysis', 
+             ha='center', va='bottom', fontsize=22)
     
-    # # Shared legend
-    # legend_handles = [
-    #     Patch(facecolor=oi_cmap['GC'], edgecolor='black', linewidth=0.5, label='GC-ERA5 vs PW-ERA5'),
-    #     Patch(facecolor=oi_cmap['HRES'], edgecolor='black', linewidth=0.5, label='GC-ERA5 vs HRES'),
-    #     Patch(facecolor=oi_cmap['PW'], edgecolor='black', linewidth=0.5, label='PW-ERA5 vs HRES')
-    # ]
+    # Shared legend
+    legend_handles = [
+        Patch(facecolor=oi_cmap['GC'], edgecolor='black', linewidth=0.5, label='GC-ERA5 vs PW-ERA5'),
+        Patch(facecolor=oi_cmap['HRES'], edgecolor='black', linewidth=0.5, label='GC-ERA5 vs HRES'),
+        Patch(facecolor=oi_cmap['PW'], edgecolor='black', linewidth=0.5, label='PW-ERA5 vs HRES')
+    ]
     
-    # fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
-    # plt.savefig('plots/boxplot_pvalues.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
-    # plt.close(fig)
+    fig.legend(handles=legend_handles, loc='lower center', ncol=3, bbox_to_anchor=(0.5, -0.075), fontsize=22)
+    plt.savefig('plots/boxplot_pvalues.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
+    plt.close(fig)
     
-    # # ----------- Barplot for PCS of operational vs non-operational models ------------------ #    
-    # fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
-    # (ax_gc_era5, ax_pw_era5), (ax_gc_ifs, ax_pw_ifs) = axes
+    # ----------- Barplot for PCS of operational vs non-operational models ------------------ #    
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
+    (ax_gc_era5, ax_pw_era5), (ax_gc_ifs, ax_pw_ifs) = axes
     
-    # # compute ΔPCS = PCS(ERA5-init) − PCS(IFS-init) for each panel
-    # diffs_gc_era5 = graphcast_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs') - graphcast_operational_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs')
-    # diffs_pw_era5 = pangu_vs_era5_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_era5_results_spatial_avg.sel(metric='pcs')
-    # diffs_gc_ifs = graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
-    # diffs_pw_ifs = pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
+    # compute ΔPCS = PCS(ERA5-init) − PCS(IFS-init) for each panel
+    diffs_gc_era5 = graphcast_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs') - graphcast_operational_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs')
+    diffs_pw_era5 = pangu_vs_era5_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_era5_results_spatial_avg.sel(metric='pcs')
+    diffs_gc_ifs = graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
+    diffs_pw_ifs = pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
     
-    # # plot panels
-    # bar_diff(ax_gc_era5, diffs_gc_era5, title='GraphCast — Ground Truth: ERA5',
-    #          ylabel='$\Delta$PCRPS-S')
-    # bar_diff(ax_pw_era5, diffs_pw_era5, title='Pangu-Weather — Ground Truth: ERA5')
-    # bar_diff(ax_gc_ifs,  diffs_gc_ifs,  title='GraphCast — Ground Truth: IFS Analysis',
-    #          ylabel='$\Delta$PCRPS-S')
-    # bar_diff(ax_pw_ifs,  diffs_pw_ifs,  title='Pangu-Weather — Ground Truth: IFS Analysis')
+    # plot panels
+    bar_diff(ax_gc_era5, diffs_gc_era5, title='GraphCast — Ground Truth: ERA5',
+             ylabel='$\Delta$PCRPS-S')
+    bar_diff(ax_pw_era5, diffs_pw_era5, title='Pangu-Weather — Ground Truth: ERA5')
+    bar_diff(ax_gc_ifs,  diffs_gc_ifs,  title='GraphCast — Ground Truth: IFS Analysis',
+             ylabel='$\Delta$PCRPS-S')
+    bar_diff(ax_pw_ifs,  diffs_pw_ifs,  title='Pangu-Weather — Ground Truth: IFS Analysis')
     
-    # # Symmetric y-limits around zero across all panels
-    # all_diffs = np.concatenate([
-    #     np.concatenate(list(diffs_gc_era5.values())),
-    #     np.concatenate(list(diffs_pw_era5.values())),
-    #     np.concatenate(list(diffs_gc_ifs.values())),
-    #     np.concatenate(list(diffs_pw_ifs.values())),
-    # ])
-    # ymax = float(np.nanmax(np.abs(all_diffs)))
-    # for ax in axes.ravel():
-    #     ax.set_ylim(-1.05 * ymax, 1.05 * ymax)
+    # Symmetric y-limits around zero across all panels
+    all_diffs = np.concatenate([
+        np.concatenate(list(diffs_gc_era5.values())),
+        np.concatenate(list(diffs_pw_era5.values())),
+        np.concatenate(list(diffs_gc_ifs.values())),
+        np.concatenate(list(diffs_pw_ifs.values())),
+    ])
+    ymax = float(np.nanmax(np.abs(all_diffs)))
+    for ax in axes.ravel():
+        ax.set_ylim(-1.05 * ymax, 1.05 * ymax)
     
-    # # One shared legend (variables)
-    # handles, labels = ax_gc_era5.get_legend_handles_labels()
-    # fig.legend(
-    #     handles, 
-    #     labels, 
-    #     loc='lower center', 
-    #     ncol=3,
-    #     bbox_to_anchor=(0.525, 0),
-    #     fontsize=20, 
-    #     columnspacing=1.5
-    # )
+    # One shared legend (variables)
+    handles, labels = ax_gc_era5.get_legend_handles_labels()
+    fig.legend(
+        handles, 
+        labels, 
+        loc='lower center', 
+        ncol=3,
+        bbox_to_anchor=(0.525, 0),
+        fontsize=20, 
+        columnspacing=1.5
+    )
     
-    # plt.tight_layout(rect=(0, 0.06, 1, 1))
-    # plt.savefig('plots/barplot_operational_vs_standard.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
-    # plt.close(fig)
+    plt.tight_layout(rect=(0, 0.06, 1, 1))
+    plt.savefig('plots/barplot_operational_vs_standard.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
+    plt.close(fig)
     
-    # # ----------- Map plot for Skill of GraphCast with ERA5 as ground truth. ------------------ #
-    # # Create a meshgrid for plotting
-    # skill = (era5_climatology_vs_era5_results.sel(metric='pc') - graphcast_vs_era5_results.sel(metric='pc')) / era5_climatology_vs_era5_results.sel(metric='pc')
+    # ----------- Map plot for Skill of GraphCast with ERA5 as ground truth. ------------------ #
+    # Create a meshgrid for plotting
+    skill = (era5_climatology_vs_era5_results.sel(metric='pc') - graphcast_vs_era5_results.sel(metric='pc')) / era5_climatology_vs_era5_results.sel(metric='pc')
     
-    # vmin = min([skill[var].min() for var in variables[:-1]])
+    vmin = min([skill[var].min() for var in variables[:-1]])
     
-    # n_colors = 256
-    # # fraction of the range that is negative:
-    # frac_neg = -vmin / (1.0 - vmin)
-    # # number of discrete colors for negative side
-    # n_neg = int(np.round(frac_neg * n_colors))
-    # n_neg = np.clip(n_neg, 1, n_colors-1)
+    n_colors = 256
+    # fraction of the range that is negative:
+    frac_neg = -vmin / (1.0 - vmin)
+    # number of discrete colors for negative side
+    n_neg = int(np.round(frac_neg * n_colors))
+    n_neg = np.clip(n_neg, 1, n_colors-1)
     
-    # neg_cmap = plt.cm.OrRd(np.linspace(0, 1, n_neg))      # reversed Reds: red→light
-    # pos_cmap = plt.cm.viridis(np.linspace(0, 1, n_colors - n_neg))
-    # combined_cmap = np.vstack([neg_cmap, pos_cmap])
+    neg_cmap = plt.cm.OrRd(np.linspace(0, 1, n_neg))      # reversed Reds: red→light
+    pos_cmap = plt.cm.viridis(np.linspace(0, 1, n_colors - n_neg))
+    combined_cmap = np.vstack([neg_cmap, pos_cmap])
     
-    # cmap = mcolors.ListedColormap(combined_cmap)
-    # norm = mcolors.Normalize(vmin=vmin, vmax=1)
+    cmap = mcolors.ListedColormap(combined_cmap)
+    norm = mcolors.Normalize(vmin=vmin, vmax=1)
     
-    # lon = era5_pc0['longitude'].values
-    # lat = era5_pc0['latitude'].values
-    # lon_grid, lat_grid = np.meshgrid(lon, lat)
+    lon = era5_pc0['longitude'].values
+    lat = era5_pc0['latitude'].values
+    lon_grid, lat_grid = np.meshgrid(lon, lat)
     
-    # n_rows = len(lead_times)
-    # n_cols = len(variables[:-1])
+    n_rows = len(lead_times)
+    n_cols = len(variables[:-1])
     
-    # # Create a grid of subplots with one row per lead time and one column per variable
-    # fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 6, n_rows * 4), subplot_kw={'projection': ccrs.Robinson()}, constrained_layout=True)
+    # Create a grid of subplots with one row per lead time and one column per variable
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 6, n_rows * 4), subplot_kw={'projection': ccrs.Robinson()}, constrained_layout=True)
     
-    # for i, lt in enumerate(lead_times):
-    #     # Convert lead time to days for the row label
-    #     lt_days = int(lt / np.timedelta64(1, 'D'))
+    for i, lt in enumerate(lead_times):
+        # Convert lead time to days for the row label
+        lt_days = int(lt / np.timedelta64(1, 'D'))
         
-    #     for j, (var, var_title) in enumerate(zip(variables[:-1], titles[:-1])):
-    #         ax = axes[i, j]
-    #         ax.coastlines()
+        for j, (var, var_title) in enumerate(zip(variables[:-1], titles[:-1])):
+            ax = axes[i, j]
+            ax.coastlines()
             
-    #         # Select the data for the variable at the given lead time
-    #         data = skill.sel(prediction_timedelta=lt)[var]
+            # Select the data for the variable at the given lead time
+            data = skill.sel(prediction_timedelta=lt)[var]
             
-    #         # Plot the data
-    #         mesh = ax.pcolormesh(lon_grid, lat_grid, data.T, cmap=cmap, norm=norm, transform=ccrs.PlateCarree(), linewidth=0.5)
-    #         ax.contour(
-    #             lon_grid, lat_grid, data.T,
-    #             levels=[0.0], colors='lightgray', linewidths=0.5,
-    #             transform=ccrs.PlateCarree()
-    #         )
+            # Plot the data
+            mesh = ax.pcolormesh(lon_grid, lat_grid, data.T, cmap=cmap, norm=norm, transform=ccrs.PlateCarree(), linewidth=0.5)
+            ax.contour(
+                lon_grid, lat_grid, data.T,
+                levels=[0.0], colors='lightgray', linewidths=0.5,
+                transform=ccrs.PlateCarree()
+            )
             
-    #         # Every subplot gets its variable title on top
-    #         ax.set_title(var_title, fontsize=24)
+            # Every subplot gets its variable title on top
+            ax.set_title(var_title, fontsize=24)
             
-    #         # If this is the bottom row, add an x-axis label and the colorbar
-    #         if i == n_rows - 1:
-    #             ax.set_xlabel('Longitude')
-    #             cbar = plt.colorbar(mesh, ax=ax, orientation='horizontal', shrink=0.75, pad=0.1)
-    #             cbar.ax.tick_params(labelsize=18)
-    #             cbar.set_label('$\\text{Skill}^{(\\text{GC-ERA5})}$', fontsize=22)
+            # If this is the bottom row, add an x-axis label and the colorbar
+            if i == n_rows - 1:
+                ax.set_xlabel('Longitude')
+                cbar = plt.colorbar(mesh, ax=ax, orientation='horizontal', shrink=0.75, pad=0.1)
+                cbar.ax.tick_params(labelsize=18)
+                cbar.set_label('$\\text{Skill}^{(\\text{GC-ERA5})}$', fontsize=22)
         
-    #     # Annotate the left-most subplot of the current row with the lead time information.
-    #     axes[i, 0].annotate(
-    #         f'Lead Time: {lt_days} day' if i==0 else f'Lead Time: {lt_days} days',
-    #         fontsize=22,
-    #         xy=(-0.1, 0.5), 
-    #         xycoords='axes fraction',
-    #         rotation=90, 
-    #         va='center'
-    #     )
-    # plt.savefig('plots/maps_graphcast_vs_era5_skill.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
-    # plt.close(fig)
+        # Annotate the left-most subplot of the current row with the lead time information.
+        axes[i, 0].annotate(
+            f'Lead Time: {lt_days} day' if i==0 else f'Lead Time: {lt_days} days',
+            fontsize=22,
+            xy=(-0.1, 0.5), 
+            xycoords='axes fraction',
+            rotation=90, 
+            va='center'
+        )
+    plt.savefig('plots/maps_graphcast_vs_era5_skill.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
+    plt.close(fig)
     
     # Compute Pearson's r and Spearman's ρ for for each variable overall as well as stratified by lead time.
     corr_df = pd.DataFrame(index=variables, columns=['pearson', 'spearman'])
