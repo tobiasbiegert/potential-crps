@@ -43,10 +43,13 @@ def style_axis(ax, ylabel, title, x_ticks, x_ticklabels):
     ax.set_title(title, fontsize=22)
     if title in ['ACC', 'PCRPS-S']:
         ax.set_ylim(0, 1)
-    elif title in ['RMSE', 'PCRPS']:
-        ax.set_ylim(0, None)
+    elif title == 'RMSE':
+        ax.set_ylim(0, 8.31) # ensure same y-axis range as for WB1 plot
+    elif title == 'PCRPS':
+        ax.set_ylim(0, 3.26) # ensure same y-axis range as for WB1 plot
     elif title == 'CPA':
         ax.set_ylim(0.5,1)
+    ax.margins(x=0.02)
 
 # Okabe-Ito colors for colorblind-friendly plots
 okabe_ito = {
@@ -106,7 +109,7 @@ def main():
     plt.rcParams['mathtext.fontset'] = 'stix'
     plt.rcParams['font.family'] = 'STIXGeneral'
     
-    # Load in PC^0
+    # Load in PCRPS^0
     era5_pc0 = xr.open_dataset('results/era5_pc0.nc', decode_timedelta=True).load()
     era5_pc0_spatial_avg = era5_pc0.map(_spatial_average, region=None, skipna=False)
     era5_pc0_mean = era5_pc0.mean(dim=['latitude', 'longitude'])
@@ -115,7 +118,7 @@ def main():
     ifs_analysis_pc0_spatial_avg = ifs_analysis_pc0.map(_spatial_average, region=None, skipna=False)
     ifs_analysis_pc0_mean = ifs_analysis_pc0.mean(dim=['latitude', 'longitude'])
     
-    # Load in PC and PCS results
+    # Load in PCRPS and PCRPS-S results
     graphcast_vs_era5_results = xr.open_dataset('results/graphcast_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     pangu_vs_era5_results = xr.open_dataset('results/pangu_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     ifs_hres_vs_era5_results = xr.open_dataset('results/ifs_hres_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
@@ -192,7 +195,7 @@ def main():
         ax_rmse.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_rmse, 'RMSE [K]', 'RMSE', lat_ticks, lat_ticklabels)
     
-    # PC
+    # PCRPS
     for name, y in [
         ('HRES', ifs_hres_metrics_lat.sel(metric='pc')), 
         ('PW-ERA5', pangu_metrics_lat.sel(metric='pc')), 
@@ -213,7 +216,7 @@ def main():
         ax_acc.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_acc, 'ACC', 'ACC', lat_ticks, lat_ticklabels)
     
-    # PCS
+    # PCRPS-S
     for name, y in [
         ('HRES', ifs_hres_metrics_lat.sel(metric='pcs')), 
         ('PW-ERA5', pangu_metrics_lat.sel(metric='pcs')), 
@@ -243,7 +246,7 @@ def main():
     plt.savefig('plots/lon_mean_metrics_72h_T850.pdf', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close(fig)
     
-    # -------- Line plot for PC of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
+    # -------- Line plot for PCRPS of WeatherBench 2 operational models with IFS analysis as ground truth, latitude weighted mean ---------- #
     # Create the figure and subplots
     fig, axes = plt.subplots(1, len(variables[:-1]), figsize=(16, 5))
     plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
@@ -294,7 +297,7 @@ def main():
     plt.savefig('plots/lineplot_operational_spatial_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close(fig)
     
-    # -------- Line plot for PC of WeatherBench 2 models with ERA5 (top) and IFS analysis (bottom) as ground truth, latitude weighted mean ---------- #
+    # -------- Line plot for PCRPS of WeatherBench 2 models with ERA5 (top) and IFS analysis (bottom) as ground truth, latitude weighted mean ---------- #
     # Create the figure and subplots
     fig, axes = plt.subplots(2, len(variables[:-1]), figsize=(16, 10))
     plot_kwargs = dict(marker='|', markersize=6, markeredgewidth=1.5)
@@ -304,7 +307,7 @@ def main():
         ax.plot(
             lead_time_days,
             era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-            label='ERA5 $\\text{PC}^{(0)}$',
+            label='ERA5 $\\text{PCRPS}^{(0)}$',
             color=oi_cmap['ERA5_PC0'],
             linestyle='--',
             **plot_kwargs
@@ -348,7 +351,7 @@ def main():
         ax.plot(
             lead_time_days,
             ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
-            label='IFS Analysis $\\text{PC}^{(0)}$', 
+            label='IFS Analysis $\\text{PCRPS}^{(0)}$', 
             color=oi_cmap['IFS_PC0'],
             linestyle='--',
             **plot_kwargs
@@ -416,8 +419,8 @@ def main():
         combined_legend[l] = h
     
     legend_order = [
-        'ERA5 $\\text{PC}^{(0)}$',
-        'IFS Analysis $\\text{PC}^{(0)}$',
+        'ERA5 $\\text{PCRPS}^{(0)}$',
+        'IFS Analysis $\\text{PCRPS}^{(0)}$',
         'ERA5 Climatology',
         'HRES',
         'PW-ERA5',
@@ -434,7 +437,7 @@ def main():
         loc='lower center', 
         ncol=6, 
         bbox_to_anchor=(0.5, -0.075), 
-        fontsize=20, 
+        fontsize=19, 
         columnspacing=1.5
     )
     for h in legend.legend_handles:          
@@ -575,11 +578,11 @@ def main():
     plt.savefig('plots/boxplot_pvalues.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
     plt.close(fig)
     
-    # ----------- Barplot for PCS of operational vs non-operational models ------------------ #    
+    # ----------- Barplot for PCRPS-S of operational vs non-operational models ------------------ #    
     fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharey=True)
     (ax_gc_era5, ax_pw_era5), (ax_gc_ifs, ax_pw_ifs) = axes
     
-    # compute ΔPCS = PCS(ERA5-init) − PCS(IFS-init) for each panel
+    # compute ΔPCRPS-S = PCRPS-S(ERA5-init) − PCRPS-S(IFS-init) for each panel
     diffs_gc_era5 = graphcast_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs') - graphcast_operational_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs')
     diffs_pw_era5 = pangu_vs_era5_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_era5_results_spatial_avg.sel(metric='pcs')
     diffs_gc_ifs = graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
