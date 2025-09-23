@@ -142,16 +142,20 @@ variables = [
     'total_precipitation_24hr',
 ]
 # Define chunking scheme
-chunking_dict = {'longitude': 60, 'latitude': 11, 'prediction_timedelta': 1, 'time': -1} # {'longitude':8}
+chunking_dict = {'longitude': 60, 'latitude': 11, 'prediction_timedelta': 1, 'time': -1}
 
 def main():
     # Open CRPS data sets
     graphcast_vs_era5_crps = xr.open_dataset('results/graphcast_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+    graphcast_operational_vs_era5_crps = xr.open_dataset('results/graphcast_operational_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     pangu_vs_era5_crps = xr.open_dataset('results/pangu_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+    pangu_operational_vs_era5_crps = xr.open_dataset('results/pangu_operational_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     ifs_hres_vs_era5_crps = xr.open_dataset('results/ifs_hres_vs_era5_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     
     graphcast_vs_ifs_analysis_crps = xr.open_dataset('results/graphcast_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+    graphcast_operational_vs_ifs_analysis_crps = xr.open_dataset('results/graphcast_operational_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     pangu_vs_ifs_analysis_crps = xr.open_dataset('results/pangu_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
+    pangu_operational_vs_ifs_analysis_crps = xr.open_dataset('results/pangu_operational_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     ifs_hres_vs_ifs_analysis_crps = xr.open_dataset('results/ifs_hres_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times).chunk(chunking_dict)
     
     # Run model-pair comparisons
@@ -175,7 +179,7 @@ def main():
             ).compute()
     graphcast_pangu_vs_ifs_analysis_p.to_netcdf('results/graphcast_pangu_vs_ifs_analysis_p.nc')
     
-    # GraphCast vs IFS‑HRES (ERA5 ground truth) – only comparison with precipitation
+    # GraphCast vs IFS‑HRES (ERA5 ground truth) – with precipitation
     with ProgressBar():
         graphcast_ifs_hres_vs_era5_p = block_permutation_test_dataset(
             graphcast_vs_era5_crps, 
@@ -210,6 +214,60 @@ def main():
             variables=variables[:-1]
             ).compute()
     pangu_hres_vs_ifs_analysis_p.to_netcdf('results/pangu_hres_vs_ifs_analysis_p.nc')
+
+    # GraphCast Operational vs Pangu Operational (ERA5 ground truth)
+    with ProgressBar():
+        graphcast_operational_pangu_operational_vs_era5_p = block_permutation_test_dataset(
+            graphcast_operational_vs_era5_crps, 
+            pangu_operational_vs_era5_crps,
+            variables=variables[:-1]
+            ).compute()
+    graphcast_operational_pangu_operational_vs_era5_p.to_netcdf('results/graphcast_operational_pangu_operational_vs_era5_p.nc')
+    
+    # GraphCast Operational vs Pangu Operational (IFS‑Analysis ground truth)
+    with ProgressBar():
+        graphcast_operational_pangu_operational_vs_ifs_analysis_p = block_permutation_test_dataset(
+            graphcast_operational_vs_ifs_analysis_crps, 
+            pangu_operational_vs_ifs_analysis_crps,
+            variables=variables[:-1]
+            ).compute()
+    graphcast_operational_pangu_operational_vs_ifs_analysis_p.to_netcdf('results/graphcast_operational_pangu_operational_vs_ifs_analysis_p.nc')
+    
+    # GraphCast Operational vs IFS‑HRES (ERA5 ground truth) – with precipitation
+    with ProgressBar():
+        graphcast_operational_ifs_hres_vs_era5_p = block_permutation_test_dataset(
+            graphcast_operational_vs_era5_crps, 
+            ifs_hres_vs_era5_crps,
+            variables=variables
+            ).compute()
+    graphcast_operational_ifs_hres_vs_era5_p.to_netcdf('results/graphcast_operational_ifs_hres_vs_era5_p.nc')
+    
+    # GraphCast Operational vs IFS‑HRES (IFS‑Analysis ground truth)
+    with ProgressBar():
+        graphcast_operational_ifs_hres_vs_ifs_analysis_p = block_permutation_test_dataset(
+            graphcast_operational_vs_ifs_analysis_crps, 
+            ifs_hres_vs_ifs_analysis_crps,
+            variables=variables[:-1]
+            ).compute()
+    graphcast_operational_ifs_hres_vs_ifs_analysis_p.to_netcdf('results/graphcast_operational_ifs_hres_vs_ifs_analysis_p.nc')
+    
+    # Pangu Operational vs IFS‑HRES (ERA5 ground truth)
+    with ProgressBar():
+        pangu_operational_ifs_hres_vs_era5_p = block_permutation_test_dataset(
+            pangu_operational_vs_era5_crps, 
+            ifs_hres_vs_era5_crps,
+            variables=variables[:-1]
+            ).compute()
+    pangu_operational_ifs_hres_vs_era5_p.to_netcdf('results/pangu_operational_ifs_hres_vs_era5_p.nc')
+    
+    # Pangu Operational vs IFS‑HRES (IFS‑Analysis ground truth)
+    with ProgressBar():    
+        pangu_operational_ifs_hres_vs_ifs_analysis_p = block_permutation_test_dataset(
+            pangu_operational_vs_ifs_analysis_crps, 
+            ifs_hres_vs_ifs_analysis_crps,
+            variables=variables[:-1]
+            ).compute()
+    pangu_operational_ifs_hres_vs_ifs_analysis_p.to_netcdf('results/pangu_operational_ifs_hres_vs_ifs_analysis_p.nc')
 
 if __name__ == '__main__':
     main()
