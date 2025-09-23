@@ -133,10 +133,7 @@ def main():
     pangu_operational_vs_ifs_analysis_results = xr.open_dataset('results/pangu_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     era5_climatology_vs_ifs_analysis_results = xr.open_dataset('results/era5_climatology_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     
-    # Load in IFS ENS CRPS
-    ifs_ens_vs_era5 = xr.open_dataset('results/ifs_ens_vs_era5_crps.nc', decode_timedelta=True).sel(lead_time=lead_times).load()
-    ifs_ens_vs_era5_crps = ifs_ens_vs_era5.rename({'lead_time':'prediction_timedelta'}).transpose(*ifs_hres_vs_era5_results.sel(metric='pc').dims)
-    
+    # Load in IFS ENS CRPS    
     ifs_ens_vs_ifs_analysis = xr.open_dataset('results/ifs_ens_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(lead_time=lead_times).load()
     ifs_ens_vs_ifs_analysis_crps = ifs_ens_vs_ifs_analysis.rename({'lead_time':'prediction_timedelta'}).transpose(*ifs_hres_vs_ifs_analysis_results.sel(metric='pc').dims)
     
