@@ -122,7 +122,7 @@ python weatherbench2/scripts/evaluate.py \
 --region=$REGION \
 --job_name=evaluate-ifs-ens-240x121-vs-era5-surface \
 --temp_location=gs://$BUCKET/tmp/ \
---setup_file=./wb2_eval_setup.py \
+--setup_file=./setup.py \
 --worker_machine_type=c3-highmem-8 \
 --autoscaling_algorithm=THROUGHPUT_BASED
 ```
