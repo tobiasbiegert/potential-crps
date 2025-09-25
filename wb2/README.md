@@ -108,19 +108,19 @@ python pc/compute_pc.py \
 ```bash
 python weatherbench2/scripts/evaluate.py \
 --forecast_path=gs://weatherbench2/datasets/ifs_ens/2018-2022-240x121_equiangular_with_poles_conservative.zarr \
---obs_path=gs://weatherbench2/datasets/era5/1959-2023_01_10-6h-240x121_equiangular_with_poles_conservative.zarr \
+--obs_path=gs://weatherbench2/datasets/hres_t0/2016-2022-6h-240x121_equiangular_with_poles_conservative.zarr \
 --climatology_path=gs://weatherbench2/datasets/era5-hourly-climatology/1990-2019_6h_240x121_equiangular_with_poles_conservative.zarr \
 --output_dir=gs://$BUCKET/baseline/ \
---output_file_prefix=ifs_ens_240x121_surface_vs_era5_2020_ \
+--output_file_prefix=ifs_ens_240x121_vs_analysis_2020_ \
 --input_chunks=init_time=1,lead_time=1 \
 --eval_configs=probabilistic_spatial \
---variables=2m_temperature,mean_sea_level_pressure,10m_wind_speed,total_precipitation_24hr \
+--variables=2m_temperature,mean_sea_level_pressure,10m_wind_speed \
 --use_beam=True \
 --runner=DataflowRunner \
 -- \
 --project=$PROJECT \
 --region=$REGION \
---job_name=evaluate-ifs-ens-240x121-vs-era5-surface \
+--job_name=evaluate-ifs-ens-240x121-vs-analysis-surface \
 --temp_location=gs://$BUCKET/tmp/ \
 --setup_file=./setup.py \
 --worker_machine_type=c3-highmem-8 \
