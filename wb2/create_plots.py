@@ -51,6 +51,34 @@ def style_axis(ax, ylabel, title, x_ticks, x_ticklabels):
         ax.set_ylim(0.5,1)
     ax.margins(x=0.02)
 
+def compute_correlations(ds_ens, ds_pc, variables, lead_times):
+    '''
+    Compute Pearson's r and Spearman's ρ for for each variable overall as well as stratified by lead time.
+    '''
+    lt_days = lead_times/np.timedelta64(1, 'D')
+    corr_df = pd.DataFrame(index=variables, columns=['pearson', 'spearman'])
+    
+    for i, var in enumerate(variables):    
+        x = ds_ens[var].values.flatten()
+        y = ds_pc.sel(metric='pc')[var].values.flatten()
+        pearson_val, _ = pearsonr(x, y)
+        spearman_val, _ = spearmanr(x, y)
+        corr_df.loc[var, 'pearson'] = pearson_val
+        corr_df.loc[var, 'spearman'] = spearman_val
+    
+    pearson_df_lt = pd.DataFrame(index=variables, columns=[int(lt) for lt in lt_days])
+    spearman_df_lt = pd.DataFrame(index=variables, columns=[int(lt) for lt in lt_days])
+    for i, var in enumerate(variables):    
+        for j, lt in enumerate(lead_times):
+            x = ds_ens.sel(prediction_timedelta=lt)[var].values.flatten()
+            y = ds_pc.sel(metric='pc').sel(prediction_timedelta=lt)[var].values.flatten()
+            pearson_val, _ = pearsonr(x, y)
+            spearman_val, _ = spearmanr(x, y)
+            pearson_df_lt.iloc[i,j] = pearson_val
+            spearman_df_lt.iloc[i,j] = spearman_val
+
+    return corr_df, pearson_df_lt, spearman_df_lt
+
 # Okabe-Ito colors for colorblind-friendly plots
 okabe_ito = {
     'black': (0, 0, 0),
@@ -111,12 +139,7 @@ def main():
     
     # Load in PCRPS^0
     era5_pc0 = xr.open_dataset('results/era5_pc0.nc', decode_timedelta=True).load()
-    era5_pc0_spatial_avg = era5_pc0.map(_spatial_average, region=None, skipna=False)
-    era5_pc0_mean = era5_pc0.mean(dim=['latitude', 'longitude'])
-    
     ifs_analysis_pc0 = xr.open_dataset('results/ifs_analysis_pc0.nc', decode_timedelta=True).load()
-    ifs_analysis_pc0_spatial_avg = ifs_analysis_pc0.map(_spatial_average, region=None, skipna=False)
-    ifs_analysis_pc0_mean = ifs_analysis_pc0.mean(dim=['latitude', 'longitude'])
     
     # Load in PCRPS and PCRPS-S results
     graphcast_vs_era5_results = xr.open_dataset('results/graphcast_vs_era5_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
@@ -133,9 +156,9 @@ def main():
     pangu_operational_vs_ifs_analysis_results = xr.open_dataset('results/pangu_operational_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     era5_climatology_vs_ifs_analysis_results = xr.open_dataset('results/era5_climatology_vs_ifs_analysis_pc.nc', decode_timedelta=True).sel(prediction_timedelta=lead_times, metric=['pc', 'pcs']).load()
     
-    # Load in IFS ENS CRPS    
+    # Load in CRPS of IFS ENS and GenCast 
     ifs_ens_vs_ifs_analysis = xr.open_dataset('results/ifs_ens_vs_ifs_analysis_crps.nc', decode_timedelta=True).sel(lead_time=lead_times).load()
-    ifs_ens_vs_ifs_analysis_crps = ifs_ens_vs_ifs_analysis.rename({'lead_time':'prediction_timedelta'}).transpose(*ifs_hres_vs_ifs_analysis_results.sel(metric='pc').dims)
+    gencast_vs_era5 = xr.open_dataset('results/gencast_vs_era5_crps.nc', decode_timedelta=True).sel(lead_time=lead_times)[variables[:-1]].load()
     
     # Load in p-values
     graphcast_pangu_vs_era5_p = xr.open_dataset('results/graphcast_pangu_vs_era5_p.nc', decode_timedelta=True).load()
@@ -146,26 +169,42 @@ def main():
     pangu_ifs_hres_vs_ifs_analysis_p = xr.open_dataset('results/pangu_ifs_hres_vs_ifs_analysis_p.nc', decode_timedelta=True).load()
     
     # Compute latitude weighted mean
-    graphcast_vs_era5_results_spatial_avg = graphcast_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    pangu_vs_era5_results_spatial_avg = pangu_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    ifs_hres_vs_era5_results_spatial_avg = ifs_hres_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    graphcast_operational_vs_era5_results_spatial_avg = graphcast_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    pangu_operational_vs_era5_results_spatial_avg = pangu_operational_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    era5_climatology_vs_era5_results_spatial_avg = era5_climatology_vs_era5_results.map(_spatial_average, region=None, skipna=False)
-    
-    graphcast_vs_ifs_analysis_results_spatial_avg = graphcast_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
-    pangu_vs_ifs_analysis_results_spatial_avg = pangu_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
-    ifs_hres_vs_ifs_analysis_results_spatial_avg = ifs_hres_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
-    graphcast_operational_vs_ifs_analysis_results_spatial_avg = graphcast_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
-    pangu_operational_vs_ifs_analysis_results_spatial_avg = pangu_operational_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
-    era5_climatology_vs_ifs_analysis_results_spatial_avg = era5_climatology_vs_ifs_analysis_results.map(_spatial_average, region=None, skipna=False)
+    era5_pc0_spatial_avg = era5_pc0.map(_spatial_average, region=None, skipna=False)
+    graphcast_vs_era5_pc_spatial_avg = graphcast_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    pangu_vs_era5_pc_spatial_avg = pangu_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    ifs_hres_vs_era5_pc_spatial_avg = ifs_hres_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    graphcast_operational_vs_era5_pc_spatial_avg = graphcast_operational_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    pangu_operational_vs_era5_pc_spatial_avg = pangu_operational_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    era5_climatology_vs_era5_pc_spatial_avg = era5_climatology_vs_era5_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+
+    ifs_analysis_pc0_spatial_avg = ifs_analysis_pc0.map(_spatial_average, region=None, skipna=False)
+    graphcast_vs_ifs_analysis_pc_spatial_avg = graphcast_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    pangu_vs_ifs_analysis_pc_spatial_avg = pangu_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    ifs_hres_vs_ifs_analysis_pc_spatial_avg = ifs_hres_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    graphcast_operational_vs_ifs_analysis_pc_spatial_avg = graphcast_operational_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    pangu_operational_vs_ifs_analysis_pc_spatial_avg = pangu_operational_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+    # era5_climatology_vs_ifs_analysis_pc_spatial_avg = era5_climatology_vs_ifs_analysis_results.sel(metric='pc').map(_spatial_average, region=None, skipna=False)
+
+    graphcast_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - graphcast_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+    pangu_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - pangu_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+    # ifs_hres_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - ifs_hres_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+    graphcast_operational_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - graphcast_operational_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+    pangu_operational_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - pangu_operational_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+    # era5_climatology_vs_era5_pcs_spatial_avg = (era5_pc0_spatial_avg - era5_climatology_vs_era5_pc_spatial_avg) / era5_pc0_spatial_avg
+
+    graphcast_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - graphcast_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
+    pangu_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - pangu_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
+    # ifs_hres_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - ifs_hres_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
+    graphcast_operational_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - graphcast_operational_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
+    pangu_operational_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - pangu_operational_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
+    # era5_climatology_vs_ifs_analysis_pcs_spatial_avg = (ifs_analysis_pc0_spatial_avg - era5_climatology_vs_ifs_analysis_pc_spatial_avg) / ifs_analysis_pc0_spatial_avg
 
     # Open 72h T850 metrics averaged over longitude
-    ifs_hres_metrics_lat = xr.open_dataset('results/ifs_hres_metrics_72h_T850.nc', decode_timedelta=True).mean(dim='longitude')['temperature'].load()
-    pangu_metrics_lat = xr.open_dataset('results/pangu_metrics_72h_T850.nc', decode_timedelta=True).mean(dim='longitude')['temperature'].load()
-    graphcast_metrics_lat = xr.open_dataset('results/graphcast_metrics_72h_T850.nc', decode_timedelta=True).mean(dim='longitude')['temperature'].load()
-    era5_climatology_metrics_lat = xr.open_dataset('results/era5_climatology_metrics_72h_T850.nc', decode_timedelta=True).mean(dim='longitude')['temperature'].load()
-    era5_persistence_metrics_lat = xr.open_dataset('results/era5_persistence_metrics_72h_T850.nc', decode_timedelta=True).mean(dim='longitude')['temperature'].load()
+    ifs_hres_metrics = xr.open_dataset('results/ifs_hres_metrics_72h_T850.nc', decode_timedelta=True)['temperature'].load()
+    pangu_metrics = xr.open_dataset('results/pangu_metrics_72h_T850.nc', decode_timedelta=True)['temperature'].load()
+    graphcast_metrics = xr.open_dataset('results/graphcast_metrics_72h_T850.nc', decode_timedelta=True)['temperature'].load()
+    era5_climatology_metrics = xr.open_dataset('results/era5_climatology_metrics_72h_T850.nc', decode_timedelta=True)['temperature'].load()
+    era5_persistence_metrics = xr.open_dataset('results/era5_persistence_metrics_72h_T850.nc', decode_timedelta=True)['temperature'].load()
 
     # ------------------------ Latitude curve plot for different metrics of T850 forecasts from WeatherBench 2 models with ERA5 as ground truth ------------------------------------- #
     LS  = {'HRES': '-', 'PW-ERA5': '-', 'GC-ERA5': '-', 'ERA5 Climatology': '--', 'Persistence': '--'}
@@ -183,54 +222,54 @@ def main():
     
     # RMSE
     for name, y in [
-        ('HRES', np.sqrt(ifs_hres_metrics_lat.sel(metric='mse'))), 
-        ('PW-ERA5', np.sqrt(pangu_metrics_lat.sel(metric='mse'))), 
-        ('GC-ERA5', np.sqrt(graphcast_metrics_lat.sel(metric='mse'))), 
-        ('ERA5 Climatology', np.sqrt(era5_climatology_metrics_lat.sel(metric='mse'))), 
-        ('Persistence', np.sqrt(era5_persistence_metrics_lat.sel(metric='mse')))
+        ('HRES', np.sqrt(ifs_hres_metrics.sel(metric='mse')).mean(dim='longitude')), 
+        ('PW-ERA5', np.sqrt(pangu_metrics.sel(metric='mse')).mean(dim='longitude')), 
+        ('GC-ERA5', np.sqrt(graphcast_metrics.sel(metric='mse')).mean(dim='longitude')), 
+        ('ERA5 Climatology', np.sqrt(era5_climatology_metrics.sel(metric='mse')).mean(dim='longitude')), 
+        ('Persistence', np.sqrt(era5_persistence_metrics.sel(metric='mse')).mean(dim='longitude'))
     ]:
         ax_rmse.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_rmse, 'RMSE [K]', 'RMSE', lat_ticks, lat_ticklabels)
     
     # PCRPS
     for name, y in [
-        ('HRES', ifs_hres_metrics_lat.sel(metric='pc')), 
-        ('PW-ERA5', pangu_metrics_lat.sel(metric='pc')), 
-        ('GC-ERA5', graphcast_metrics_lat.sel(metric='pc')), 
-        ('ERA5 Climatology', era5_climatology_metrics_lat.sel(metric='pc')), 
-        ('Persistence', era5_persistence_metrics_lat.sel(metric='pc'))
+        ('HRES', ifs_hres_metrics.sel(metric='pc').mean(dim='longitude')), 
+        ('PW-ERA5', pangu_metrics.sel(metric='pc').mean(dim='longitude')), 
+        ('GC-ERA5', graphcast_metrics.sel(metric='pc').mean(dim='longitude')), 
+        ('ERA5 Climatology', era5_climatology_metrics.sel(metric='pc').mean(dim='longitude')), 
+        ('Persistence', era5_persistence_metrics.sel(metric='pc').mean(dim='longitude'))
     ]:
         ax_pc.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_pc, 'PCRPS [K]', 'PCRPS', lat_ticks, lat_ticklabels)
     
     # ACC
     for name, y in [
-        ('HRES', ifs_hres_metrics_lat.sel(metric='acc')), 
-        ('PW-ERA5', pangu_metrics_lat.sel(metric='acc')), 
-        ('GC-ERA5', graphcast_metrics_lat.sel(metric='acc')), 
-        ('Persistence', era5_persistence_metrics_lat.sel(metric='acc'))
+        ('HRES', ifs_hres_metrics.sel(metric='acc').mean(dim='longitude')), 
+        ('PW-ERA5', pangu_metrics.sel(metric='acc').mean(dim='longitude')), 
+        ('GC-ERA5', graphcast_metrics.sel(metric='acc').mean(dim='longitude')), 
+        ('Persistence', era5_persistence_metrics.sel(metric='acc').mean(dim='longitude'))
     ]:
         ax_acc.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_acc, 'ACC', 'ACC', lat_ticks, lat_ticklabels)
     
     # PCRPS-S
     for name, y in [
-        ('HRES', ifs_hres_metrics_lat.sel(metric='pcs')), 
-        ('PW-ERA5', pangu_metrics_lat.sel(metric='pcs')), 
-        ('GC-ERA5', graphcast_metrics_lat.sel(metric='pcs')), 
-        ('ERA5 Climatology', era5_climatology_metrics_lat.sel(metric='pcs')),
-        ('Persistence', era5_persistence_metrics_lat.sel(metric='pcs'))
+        ('HRES', ifs_hres_metrics.sel(metric='pcs').mean(dim='longitude')), 
+        ('PW-ERA5', pangu_metrics.sel(metric='pcs').mean(dim='longitude')), 
+        ('GC-ERA5', graphcast_metrics.sel(metric='pcs').mean(dim='longitude')), 
+        ('ERA5 Climatology', era5_climatology_metrics.sel(metric='pcs').mean(dim='longitude')),
+        ('Persistence', era5_persistence_metrics.sel(metric='pcs').mean(dim='longitude'))
     ]:
         ax_pcs.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_pcs, 'PCRPS-S', 'PCRPS-S', lat_ticks, lat_ticklabels)
     
     # CPA
     for name, y in [
-        ('HRES', ifs_hres_metrics_lat.sel(metric='cpa')), 
-        ('PW-ERA5', pangu_metrics_lat.sel(metric='cpa')), 
-        ('GC-ERA5', graphcast_metrics_lat.sel(metric='cpa')), 
-        ('ERA5 Climatology', era5_climatology_metrics_lat.sel(metric='cpa')), 
-        ('Persistence', era5_persistence_metrics_lat.sel(metric='cpa'))
+        ('HRES', ifs_hres_metrics.sel(metric='cpa').mean(dim='longitude')), 
+        ('PW-ERA5', pangu_metrics.sel(metric='cpa').mean(dim='longitude')), 
+        ('GC-ERA5', graphcast_metrics.sel(metric='cpa').mean(dim='longitude')), 
+        ('ERA5 Climatology', era5_climatology_metrics.sel(metric='cpa').mean(dim='longitude')), 
+        ('Persistence', era5_persistence_metrics.sel(metric='cpa').mean(dim='longitude'))
     ]:
         ax_cpa.plot(y['latitude'], y, color=oi_cmap[name], linestyle=LS[name], label=name)
     style_axis(ax_cpa, 'CPA', 'CPA', lat_ticks, lat_ticklabels)
@@ -252,21 +291,21 @@ def main():
     for ax, var, title, unit in zip(axes, variables[:-1], titles[:-1], units[:-1]):
         ax.plot(
             lead_time_days, 
-            ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            ifs_hres_vs_ifs_analysis_pc_spatial_avg[var],
             label='HRES', 
             color=oi_cmap['HRES'],
             **plot_kwargs
         )
         ax.plot(
             lead_time_days, 
-            pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            pangu_operational_vs_ifs_analysis_pc_spatial_avg[var],
             label='PW-IFS', 
             color=oi_cmap['PW'],
             **plot_kwargs
         )
         ax.plot(
             lead_time_days, 
-            graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
+            graphcast_operational_vs_ifs_analysis_pc_spatial_avg[var],
             label='GC-IFS', 
             color=oi_cmap['GC'],
             **plot_kwargs
@@ -303,7 +342,7 @@ def main():
     for ax, var, title, unit in zip(axes[0, :], variables[:-1], titles[:-1], units[:-1]):
         ax.plot(
             lead_time_days,
-            era5_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
+            era5_pc0_spatial_avg[var],
             label='ERA5 $\\text{PCRPS}^{(0)}$',
             color=oi_cmap['ERA5_PC0'],
             linestyle='--',
@@ -311,7 +350,7 @@ def main():
         )
         ax.plot(
             lead_time_days,
-            era5_climatology_vs_era5_results_spatial_avg.sel(metric='pc')[var],
+            era5_climatology_vs_era5_pc_spatial_avg[var],
             label='ERA5 Climatology', 
             color=oi_cmap['ERA5 Climatology'],
             linestyle='--',
@@ -319,19 +358,19 @@ def main():
         )
         ax.plot(
             lead_time_days,
-            ifs_hres_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
+            ifs_hres_vs_era5_pc_spatial_avg[var], 
             color=oi_cmap['HRES'],
             **plot_kwargs    
         )
         ax.plot(
             lead_time_days,
-            pangu_vs_era5_results_spatial_avg.sel(metric='pc')[var], 
+            pangu_vs_era5_pc_spatial_avg[var], 
             color=oi_cmap['PW'],
             **plot_kwargs
         )
         ax.plot(
             lead_time_days,
-            graphcast_vs_era5_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var], 
+            graphcast_vs_era5_pc_spatial_avg[var], 
             color=oi_cmap['GC'],
             **plot_kwargs
         )
@@ -347,7 +386,7 @@ def main():
     for ax, var, title, unit in zip(axes[1, :], variables[:-1], titles[:-1], units[:-1]):
         ax.plot(
             lead_time_days,
-            ifs_analysis_pc0_spatial_avg.sel(prediction_timedelta=lead_times)[var],
+            ifs_analysis_pc0_spatial_avg[var],
             label='IFS Analysis $\\text{PCRPS}^{(0)}$', 
             color=oi_cmap['IFS_PC0'],
             linestyle='--',
@@ -355,21 +394,21 @@ def main():
         )
         ax.plot(
             lead_time_days,
-            ifs_hres_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            ifs_hres_vs_ifs_analysis_pc_spatial_avg[var],
             label='HRES', 
             color=oi_cmap['HRES'],
             **plot_kwargs
         )
         ax.plot(
             lead_time_days,
-            pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pc')[var],
+            pangu_vs_ifs_analysis_pc_spatial_avg[var],
             label='PW-ERA5', 
             color=oi_cmap['PW'],
             **plot_kwargs
         )
         ax.plot(
             lead_time_days,
-            graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pc', prediction_timedelta=lead_times)[var],
+            graphcast_vs_ifs_analysis_pc_spatial_avg[var],
             label='GC-ERA5', 
             color=oi_cmap['GC'],
             **plot_kwargs
@@ -440,7 +479,7 @@ def main():
     for h in legend.legend_handles:          
         h.set_marker('')
         
-    plt.savefig('plots/lineplot_lat_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
+    plt.savefig('plots/lineplot_spatial_mean_pc.pdf', bbox_inches='tight', dpi=300, facecolor='white')
     plt.close(fig)
     
     # ----------------------------- Boxplots of p-values with ERA5 (top) and IFS analysis (bottom) as ground truth ----------------------------- #
@@ -580,10 +619,10 @@ def main():
     (ax_gc_era5, ax_pw_era5), (ax_gc_ifs, ax_pw_ifs) = axes
     
     # compute ΔPCRPS-S = PCRPS-S(ERA5-init) − PCRPS-S(IFS-init) for each panel
-    diffs_gc_era5 = graphcast_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs') - graphcast_operational_vs_era5_results_spatial_avg[variables[:-1]].sel(metric='pcs')
-    diffs_pw_era5 = pangu_vs_era5_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_era5_results_spatial_avg.sel(metric='pcs')
-    diffs_gc_ifs = graphcast_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - graphcast_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
-    diffs_pw_ifs = pangu_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs') - pangu_operational_vs_ifs_analysis_results_spatial_avg.sel(metric='pcs')
+    diffs_gc_era5 = graphcast_vs_era5_pcs_spatial_avg[variables[:-1]] - graphcast_operational_vs_era5_pcs_spatial_avg[variables[:-1]]
+    diffs_pw_era5 = pangu_vs_era5_pcs_spatial_avg - pangu_operational_vs_era5_pcs_spatial_avg
+    diffs_gc_ifs = graphcast_vs_ifs_analysis_pcs_spatial_avg - graphcast_operational_vs_ifs_analysis_pcs_spatial_avg
+    diffs_pw_ifs = pangu_vs_ifs_analysis_pcs_spatial_avg - pangu_operational_vs_ifs_analysis_pcs_spatial_avg
     
     # plot panels
     bar_diff(ax_gc_era5, diffs_gc_era5, title='GraphCast — Ground Truth: ERA5',
@@ -690,33 +729,11 @@ def main():
         )
     plt.savefig('plots/maps_graphcast_vs_era5_skill.png', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
     plt.close(fig)
-    
-    # Compute Pearson's r and Spearman's ρ for for each variable overall as well as stratified by lead time.
-    corr_df = pd.DataFrame(index=variables, columns=['pearson', 'spearman'])
-    
-    for i, var in enumerate(variables[:-1]):    
-        x = ifs_ens_vs_ifs_analysis_crps[var].values.flatten()
-        y = ifs_hres_vs_ifs_analysis_results.sel(metric='pc')[var].values.flatten()
-        pearson_val, _ = pearsonr(x, y)
-        spearman_val, _ = spearmanr(x, y)
-        corr_df.loc[var, 'pearson'] = pearson_val
-        corr_df.loc[var, 'spearman'] = spearman_val
-    corr_df.to_csv(f'results/corr_df.csv')
-    
-    pearson_df_lt = pd.DataFrame(index=variables, columns=[int(lt) for lt in lead_time_days])
-    spearman_df_lt = pd.DataFrame(index=variables, columns=[int(lt) for lt in lead_time_days])
-    for i, var in enumerate(variables[:-1]):    
-        for j, lt in enumerate(lead_times):
-            x = ifs_ens_vs_ifs_analysis_crps.sel(prediction_timedelta=lt)[var].values.flatten()
-            y = ifs_hres_vs_ifs_analysis_results.sel(metric='pc').sel(prediction_timedelta=lt)[var].values.flatten()
-            pearson_val, _ = pearsonr(x, y)
-            spearman_val, _ = spearmanr(x, y)
-            pearson_df_lt.iloc[i,j] = pearson_val
-            spearman_df_lt.iloc[i,j] = spearman_val
-    pearson_df_lt.to_csv(f'results/pearson_df_lt.csv')
-    spearman_df_lt.to_csv(f'results/spearman_df_lt.csv')
-    
+
     # --------- Scatterplot for in-sample PCRPS of IFS HRES vs out-of-sample CRPS of IFS ENS with IFS Analysis as ground truth. ---------- #
+    ifs_ens_vs_ifs_analysis_crps = ifs_ens_vs_ifs_analysis.rename({'lead_time':'prediction_timedelta'}).transpose(*ifs_hres_vs_ifs_analysis_results.sel(metric='pc').dims)
+    ifs_hres_ens_corr_df, ifs_hres_ens_pearson_df_lt, ifs_hres_ens_spearman_df_lt = compute_correlations(ifs_ens_vs_ifs_analysis_crps, ifs_hres_vs_ifs_analysis_results, variables[:-1], lead_times)
+    
     xlims = [(0, 830), (0, 4.3), (0, 3.2)] 
     ylims = [(0, 830), (0, 4.3), (0, 3.2)]  
     
@@ -774,9 +791,9 @@ def main():
                 markeredgewidth=0.3       
             )
             pearson_handles.append(handle)
-            pearson_labels.append(f'{pearson_df_lt.loc[var,lt]:.3f}')
+            pearson_labels.append(f'{ifs_hres_ens_pearson_df_lt.loc[var,lt]:.3f}')
     
-        pearson_full = corr_df.loc[var, 'pearson']
+        pearson_full = ifs_hres_ens_corr_df.loc[var, 'pearson']
         leg1 = ax.legend(
             pearson_handles, pearson_labels,
             title=f'$r$ = {pearson_full:.3f}',
@@ -814,9 +831,9 @@ def main():
                 markeredgewidth=0.3        
             )
             spearman_handles.append(handle)
-            spearman_labels.append(f'{spearman_df_lt.loc[var,lt]:.3f}')
+            spearman_labels.append(f'{ifs_hres_ens_spearman_df_lt.loc[var,lt]:.3f}')
             
-        spearman_full = corr_df.loc[var, 'spearman']
+        spearman_full = ifs_hres_ens_corr_df.loc[var, 'spearman']
         leg2 = ax.legend(
             spearman_handles, spearman_labels,
             title=f'$\\rho$ = {spearman_full:.3f}',
@@ -871,6 +888,166 @@ def main():
     
     plt.tight_layout(rect=[0, 0.1, 1, 1])
     plt.savefig('plots/scatterplot_ens_vs_hres.pdf', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
+    plt.close(fig)
+
+    # --------- Scatterplot for in-sample PCRPS of GraphCast vs out-of-sample CRPS of GenCast with ERA5 as ground truth. ---------- #
+    gencast_vs_era5_crps = gencast_vs_era5.rename({'lead_time':'prediction_timedelta'}).transpose(*graphcast_vs_era5_results.sel(metric='pc').dims)
+    graphcast_gencast_corr_df, graphcast_gencast_pearson_df_lt, graphcast_gencast_spearman_df_lt = compute_correlations(gencast_vs_era5_crps, graphcast_vs_era5_results, variables[:-1], lead_times)
+
+    xlims = [(0, 830), (0, 4.3), (0, 3.2)] # same as for IFS HRES and ENS
+    ylims = [(0, 830), (0, 4.3), (0, 3.2)] # same as for IFS HRES and ENS
+    
+    fig, axes = plt.subplots(1, len(variables[:-1]), figsize=(24, 8))
+    
+    for ax, var, title, xlim_val, ylim_val, unit in zip(axes, variables[:-1], titles[:-1], xlims, ylims, units[:-1]):
+        
+        # Stack (prediction_timedelta, latitude, longitude) into one dimension "points"
+        gencast_data_stacked = gencast_vs_era5[var].rename({'lead_time':'prediction_timedelta'}).stack(points=('prediction_timedelta', 'latitude', 'longitude'))
+        graphcast_data_stacked = graphcast_vs_era5_results.sel(metric='pc')[var].stack(points=('prediction_timedelta', 'latitude', 'longitude'))
+        
+        # Align the two DataArrays so that they share matching coordinates
+        ens_aligned, hres_aligned = xr.align(gencast_data_stacked, graphcast_data_stacked, join='inner')
+        
+        # Convert to NumPy arrays
+        x = hres_aligned.values
+        y = ens_aligned.values
+        
+        # Extract lead times (in days) from the 'prediction_timedelta' coordinate
+        lt_days = ens_aligned['prediction_timedelta'].dt.days.values
+        
+        # Use discrete, standard colors (one per unique lead time)
+        unique_leads = np.unique(lt_days)
+        standard_colors = [okabe_ito_norm['sky_blue'], okabe_ito_norm['orange'], okabe_ito_norm['bluish_green'], okabe_ito_norm['vermilion'], okabe_ito_norm['blue']]
+        lead_to_color = dict(zip(unique_leads, standard_colors))
+        
+        # Map the lead time values to the corresponding colors
+        point_colors = np.array([lead_to_color[lt] for lt in lt_days])
+        
+        # Create the scatter plot
+        ax.scatter(x[::-1], y[::-1], c=point_colors[::-1], s=2, alpha=0.7, rasterized=True)
+        
+        # Add a reference line from the origin to the top-right corner of the limits
+        ax.plot([xlim_val[0], xlim_val[1]], [ylim_val[0], ylim_val[1]], color='k', linestyle='--', linewidth=1.5)
+        
+        ax.set_ylabel('GenCast CRPS ' + unit, fontsize=20)
+        ax.set_xlabel('GC-ERA5 PCRPS ' + unit, fontsize=20)
+        ax.set_title(title, fontsize=28)
+        ax.set_xlim(xlim_val)
+        ax.set_ylim(ylim_val)
+        ax.tick_params(axis='both', which='major', labelsize=20)
+    
+        # Build legend for Pearson's r in UL corner
+        pearson_handles = []
+        pearson_labels  = []
+        for j, lt in enumerate(unique_leads):
+            handle = Line2D(
+                [], [], 
+                color=lead_to_color[lt], 
+                marker='o', 
+                linestyle='None', 
+                markersize=10, 
+                label=int(lt),
+                markeredgecolor='black',  
+                markeredgewidth=0.3       
+            )
+            pearson_handles.append(handle)
+            pearson_labels.append(f'{graphcast_gencast_pearson_df_lt.loc[var,lt]:.3f}')
+    
+        pearson_full = graphcast_gencast_corr_df.loc[var, 'pearson']
+        leg1 = ax.legend(
+            pearson_handles, pearson_labels,
+            title=f'$r$ = {pearson_full:.3f}',
+            loc='upper left',
+            fontsize=20, title_fontsize=20,
+            framealpha=0.5,
+            borderpad=0.2,
+            borderaxespad=0.2,
+            handletextpad=0.4
+        )
+        # Box the overall r
+        title1 = leg1.get_title()
+        title1.set_bbox(
+            dict(
+                mutation_aspect=0.33,
+                fill=False,
+                edgecolor='black',
+                boxstyle='round,pad=0.55,rounding_size=0.3'
+            )
+        )
+        ax.add_artist(leg1)
+    
+        # Build legend for Spearman's ρ in LR corner
+        spearman_handles = []
+        spearman_labels  = []
+        for j, lt in enumerate(unique_leads):
+            handle = Line2D(
+                [], [], 
+                color=lead_to_color[lt], 
+                marker='o', 
+                linestyle='None', 
+                markersize=10, 
+                label=int(lt),
+                markeredgecolor='black',  
+                markeredgewidth=0.3        
+            )
+            spearman_handles.append(handle)
+            spearman_labels.append(f'{graphcast_gencast_spearman_df_lt.loc[var,lt]:.3f}')
+            
+        spearman_full = graphcast_gencast_corr_df.loc[var, 'spearman']
+        leg2 = ax.legend(
+            spearman_handles, spearman_labels,
+            title=f'$\\rho$ = {spearman_full:.3f}',
+            loc='lower right',
+            fontsize=20, title_fontsize=20,
+            framealpha=0.5,
+            borderpad=0.2,
+            borderaxespad=0.2,
+            handletextpad=0.4
+        )
+        # Box the overall ρ
+        title2 = leg2.get_title()
+        title2.set_bbox(
+            dict(
+                mutation_aspect=0.37,
+                fill=False,
+                edgecolor='black',
+                boxstyle='round,pad=0.45,rounding_size=0.3'
+            )
+        )
+    
+    # Create combined legend
+    legend_handles = []
+    for lt in unique_leads:
+        color = lead_to_color[lt]
+        handle = Line2D(
+            [], [], 
+            color=color, 
+            marker='o', 
+            linestyle='None', 
+            markersize=14, 
+            label=int(lt),
+            markeredgecolor='black',  
+            markeredgewidth=0.5        
+        )
+        legend_handles.append(handle)
+    
+    # Add the legend at the bottom center of the figure.
+    leg3 = fig.legend(
+        legend_handles, 
+        [handle.get_label() for handle in legend_handles],
+        loc='lower center', 
+        ncol=len(unique_leads), 
+        bbox_to_anchor=(0.5175, -0.01), 
+        fontsize=18, 
+        title='Lead Time [d]', 
+        title_fontsize=22, 
+        prop={'size': 20}, 
+        handletextpad=0.3,
+        columnspacing=1
+    )
+    
+    plt.tight_layout(rect=[0, 0.1, 1, 1])
+    plt.savefig('plots/scatterplot_gencast_vs_graphcast_no_precip.pdf', dpi=300, facecolor='white', edgecolor='none', bbox_inches='tight')
     plt.close(fig)
 
 if __name__ == '__main__':

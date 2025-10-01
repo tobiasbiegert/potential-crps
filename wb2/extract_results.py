@@ -107,3 +107,8 @@ ifs_ens_vs_era5_crps.to_netcdf('results/ifs_ens_vs_era5_crps.nc')
 with ProgressBar():
     ifs_ens_vs_ifs_analysis_crps = xr.open_zarr('gs://$BUCKET/baseline/ifs_ens_240x121_vs_analysis_2020_probabilistic_spatial.zarr', decode_timedelta=True)[variables[:-1]].sel(lead_time=lead_times, metric='crps').load()
 ifs_ens_vs_ifs_analysis_crps.to_netcdf('results/ifs_ens_vs_ifs_analysis_crps.nc')
+
+# Get CRPS of GenCast for each grid point.
+with ProgressBar():
+    gencast_vs_era5_crps = xr.open_zarr('gs://$BUCKET/baseline/gencast_240x121_surface_vs_era5_2020_probabilistic_spatial.zarr', decode_timedelta=True).sel(lead_time=lead_times, metric='crps').reset_coords('lead_time_secs', drop=True).load()
+gencast_vs_era5_crps.to_netcdf('results/gencast_vs_era5_crps.nc')
