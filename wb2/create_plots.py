@@ -743,13 +743,13 @@ def main():
         
         # Stack (prediction_timedelta, latitude, longitude) into one dimension "points"
         ens_data_stacked = ifs_ens_vs_ifs_analysis[var].rename({'lead_time':'prediction_timedelta'}).stack(points=('prediction_timedelta', 'latitude', 'longitude'))
-        hres_data_stacked = ifs_hres_vs_ifs_analysis_results.sel(metric='pc')[var].stack(points=('prediction_timedelta', 'latitude', 'longitude'))
+        pc_data_stacked = ifs_hres_vs_ifs_analysis_results.sel(metric='pc')[var].stack(points=('prediction_timedelta', 'latitude', 'longitude'))
         
         # Align the two DataArrays so that they share matching coordinates
-        ens_aligned, hres_aligned = xr.align(ens_data_stacked, hres_data_stacked, join='inner')
+        ens_aligned, pc_aligned = xr.align(ens_data_stacked, pc_data_stacked, join='inner')
         
         # Convert to NumPy arrays
-        x = hres_aligned.values
+        x = pc_aligned.values
         y = ens_aligned.values
         
         # Extract lead times (in days) from the 'prediction_timedelta' coordinate
@@ -902,14 +902,14 @@ def main():
     for ax, var, title, xlim_val, ylim_val, unit in zip(axes, variables[:-1], titles[:-1], xlims, ylims, units[:-1]):
         
         # Stack (prediction_timedelta, latitude, longitude) into one dimension "points"
-        gencast_data_stacked = gencast_vs_era5[var].rename({'lead_time':'prediction_timedelta'}).stack(points=('prediction_timedelta', 'latitude', 'longitude'))
-        graphcast_data_stacked = graphcast_vs_era5_results.sel(metric='pc')[var].stack(points=('prediction_timedelta', 'latitude', 'longitude'))
+        ens_data_stacked = gencast_vs_era5[var].rename({'lead_time':'prediction_timedelta'}).stack(points=('prediction_timedelta', 'latitude', 'longitude'))
+        pc_data_stacked = graphcast_vs_era5_results.sel(metric='pc')[var].stack(points=('prediction_timedelta', 'latitude', 'longitude'))
         
         # Align the two DataArrays so that they share matching coordinates
-        ens_aligned, hres_aligned = xr.align(gencast_data_stacked, graphcast_data_stacked, join='inner')
+        ens_aligned, pc_aligned = xr.align(ens_data_stacked, pc_data_stacked, join='inner')
         
         # Convert to NumPy arrays
-        x = hres_aligned.values
+        x = pc_aligned.values
         y = ens_aligned.values
         
         # Extract lead times (in days) from the 'prediction_timedelta' coordinate
