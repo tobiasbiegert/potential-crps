@@ -20,7 +20,7 @@ The code is written in Python and uses the following libraries (as specified in 
 - `h5netcdf==1.3.0`
 - `isodisreg @ git+https://github.com/evwalz/isodisreg.git@c293eb3a126f200bf4894ecbab6157596c2a395e`
 - `matplotlib==3.8.4`
-- `numpy==1.26.4`
+- `numpy==2.2.5`
 - `pandas==2.2.3`
 - `scipy==1.13.0`
 - `shapely<2.0`
