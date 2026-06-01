@@ -188,6 +188,7 @@ def plot_thresh_graph():
     g.set(xlabel='Threshold c', ylabel='', title='')
     plt.legend(title='')
     g.get_figure().savefig(os.path.join(save_plots, 'stat_by_threshold.png'))
+    plt.close()
 
 
 def analyze_runtime():
@@ -221,6 +222,7 @@ def plot_runtime():
     plt.legend(title='')
     plt.tight_layout()
     g.get_figure().savefig(os.path.join(save_plots, 'runtime.png'))
+    plt.close()
 
 
 if __name__ == '__main__':
