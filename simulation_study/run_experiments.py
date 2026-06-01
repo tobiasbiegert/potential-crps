@@ -227,9 +227,13 @@ if __name__ == '__main__':
     if not os.path.exists(save_plots):
         print(f'Please create directory {save_plots}')
     else:
-        # run_simulation_example_1(n=10000, square_y=True)
-        # run_simulation_example_2(thresh_list=np.linspace(1, 40, 100), add_name='_graph')
-        # plot_thresh_graph()
-        # print_results()
-        # analyze_runtime()
-        plot_runtime()
+        run_simulation_example_1(n=10000, square_y=True)
+        run_simulation_example_1(n=10000, square_y=False)
+        print_results()     # need computed loss values for normal and squared Y
+        
+        run_simulation_example_2(thresh_list=np.linspace(1, 40, 100), add_name='_graph')
+        plot_thresh_graph() # need example 2 to have run before hand
+        
+        analyze_runtime()
+        plot_runtime()      # run analyze runtime before
+
